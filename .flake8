@@ -1,0 +1,35 @@
+[flake8]
+# config
+test-func-name-validator-regex = "test_.*"
+
+suppress-dummy-args = true
+
+literal-inline-quotes = "double"
+literal-multiline-quotes = "double"
+literal-docstring-quotes = "double"
+literal-include-name = true
+
+# black
+max-line-length = 88
+
+# ignores
+extend-ignore =
+  # not required or shadowed by other plugins
+  D I FI TC Q U101 S101 WPS400
+
+  # black
+  WPS348
+  # weird
+  PIE803 C101 FNE008
+  # broken
+  PIE798 WPS226 WPS354
+
+  # don't block features
+  WPS305  # f-strings are the best
+  WPS306  # python 2.x is deprecated
+  WPS420  # pass is a thing
+  WPS430  # nested functions
+  WPS501  # try-finally with no except
+  WPS600  # subclassing lowercase builtins
+  WPS602  # @staticmethod
+  WPS605  # methods with no arguments

@@ -1,0 +1,61 @@
+# See https://pre-commit.com/ for usage and config
+
+default_language_version:
+  python: python3.11
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      # general:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      # executable files:
+      - id: check-executables-have-shebangs
+      # other files (markup & docs):
+      - id: check-json
+      - id: check-yaml
+
+  - repo: https://github.com/myint/autoflake
+    rev: v1.6.0
+    hooks:
+      - id: autoflake
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+
+  - repo: local
+    hooks:
+      - id: flake8
+        name: flake8
+        language: system
+        entry: flake8
+        types_or: [python, pyi]
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (full)
+        language: system
+        entry: mypy
+        args:
+          - "--strict"
+        require_serial: true
+        types_or: [python, pyi]
+
+  - repo: https://github.com/python-poetry/poetry
+    rev: 1.4.1
+    hooks:
+      - id: poetry-check
+        files: ^(pyproject.toml|poetry.lock)$
+      - id: poetry-lock
+        files: ^(pyproject.toml|poetry.lock)$
+        args: ["--no-update"]
