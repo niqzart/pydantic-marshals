@@ -1,12 +1,13 @@
 [tool.poetry]
-name = "python-template"  # change this
+name = "pydantic-marshals"
 version = "0.1.0"
-description = "Python project template by niqzart"  # change this
-authors = ["niqzart"]  # change this
+description = "Library for creating partial pydantic models (automatic converters) from different mappings"
+authors = ["niqzart <niqzart@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+pydantic = ">=2.0,<3.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.2"
@@ -35,6 +36,10 @@ flake8-use-fstring = "1.4"
 flake8-use-pathlib = "0.3.0"
 flake8-test-name = "^0.1.5"
 wemake-python-styleguide = "^0.17.0"
+
+
+[tool.poetry.group.sqlaclhemy.dependencies]
+sqlalchemy = ">=2.0,<3.0"
 
 [tool.isort]
 profile = "black"
