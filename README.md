@@ -1,61 +1,25 @@
-# Python Template
-## Basics
-A template repository for python projects with:
-- Poetry
-- Linters (flake8, wemake-style-guide, mypy)
-- Formatters (black, autoflake)
-- Pre-commit
-- Pytest
+# Pydantic Marshals
+Library for creating partial pydantic models (automatic converters) from different mappings. Currently, it consists of basic boilerplate parts and functional implementation for sqlalchemy 2.0+ (included via extra)
 
-### How to use
-Click "use this template" on the top right of the main repository page and create a new repository from this one. After that you can work on your new repository as usual. I'd recommend searching all `change this` comments in `pyproject.toml` and changing those lines to whatever you seem fit
+## Base Interface
+TBA
 
-### Install
-```
-pip install poetry
+## Implementations
+TBA
+
+### SQLAlchemy: Basic usage
+TBA
+
+## Local development
+1. Clone the repository
+2. Setup python (the library is made with python 3.11)
+3. Install poetry (should work with v1.5.1)
+4. Install dependencies
+5. Install pre-commit hooks
+
+Commands to use:
+```sh
+pip install poetry==1.5.1
 poetry install
 pre-commit install
-```
-
-## Additions
-### Docker
-Here is a template dockerfile for python /w poetry:
-```dockerfile
-FROM python:3.11-alpine
-
-# change to any directory
-WORKDIR /app
-RUN pip install --upgrade pip
-
-# set to your poetry version
-RUN pip install poetry==1.4.1
-RUN poetry config virtualenvs.create false
-
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-interaction --no-ansi --only main
-
-# COPY your project files
-
-# set the ENTRYPOINT and/or CMD
-```
-
-### Docker Compose
-And a template docker-compose file:
-```yaml
-services:
-  app:
-    # depends_on:
-    #   - database
-    build:
-      context: .
-      dockerfile: Dockerfile
-    # image:
-    restart: always
-    # command: ...
-    # ports:
-    #   - "8000:8000"
-    # volumes:
-    #   - ./<SOURCE>:/<WORKDIR>  # pass your files for quik-reload
-    # environment:
-    #   SECRET: local
 ```
