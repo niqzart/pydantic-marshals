@@ -30,6 +30,7 @@ extend-ignore =
   WPS214
 
   # don't block features
+  WPS237  # screams at 'complex' f-strings
   WPS305  # f-strings are the best
   WPS306  # python 2.x is deprecated
   WPS420  # pass is a thing
