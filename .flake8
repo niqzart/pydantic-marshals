@@ -1,6 +1,6 @@
 [flake8]
 # config
-test-func-name-validator-regex = "test_.*"
+test-func-name-validator-regex = test_.*
 
 suppress-dummy-args = true
 
