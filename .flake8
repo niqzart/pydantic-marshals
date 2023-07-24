@@ -20,10 +20,14 @@ extend-ignore =
   # black
   WPS348
   # weird
-  PIE803 C101 FNE008 ANN101
+  PIE803 C101 FNE008 ANN101 ANN102
   # broken
   PIE798 WPS226 WPS354 RST304
   WPS322 WPS428 WPS462  # fails for class-attribute docstrings
+  U100  # fails to understand `raise NotImplementedError`
+
+  # too many
+  WPS214
 
   # don't block features
   WPS305  # f-strings are the best

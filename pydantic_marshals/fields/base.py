@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Self
 
 from pydantic.fields import Field, FieldInfo
 
@@ -18,6 +18,14 @@ class MarshalField:
         :param alias: same as Field(alias=...), can be None for no alias
         """
         self.alias = alias
+
+    @classmethod
+    def convert(cls, *source: Any) -> Self | None:
+        """
+        Convert something into a field.
+        If conversion is not possible, this method should return None
+        """
+        raise NotImplementedError
 
     def generate_name(self) -> str:
         """

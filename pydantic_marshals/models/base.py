@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from typing import Any, ClassVar
 
 from pydantic import BaseModel, create_model
@@ -16,6 +17,9 @@ class MarshalModel:
     updated base model, new runtime methods or auto-converters for fields
     """
 
+    field_types: tuple[type[MarshalField], ...] = ()
+    """Field types to be used in :py:meth:`convert_field`"""
+
     def __init__(
         self,
         *fields: MarshalField,
@@ -31,6 +35,55 @@ class MarshalModel:
 
     def __set_name__(self, owner: type, name: str) -> None:
         self.model_name: str = f"{owner.__qualname__}.{name}"
+
+    @classmethod
+    def convert_field(cls, raw_field: Any) -> MarshalField:
+        """
+        Converts "raw_field"s into :py:class:`MarshalField` by trying to call
+        the .convert method on all of :py:attr:`field_types` in this class.
+        Will raise a `RuntimeError` if none of them return MarshalField
+        """
+        if isinstance(raw_field, MarshalField):
+            return raw_field
+
+        if not isinstance(raw_field, tuple):
+            raw_field = (raw_field,)
+
+        for field_type in cls.field_types:
+            field: MarshalField | None = field_type.convert(*raw_field)
+            if field is not None:
+                return field
+        raise RuntimeError(f"Couldn't convert field: {raw_field}")
+
+    @classmethod
+    def convert_aliased_field(cls, raw_field: Any, alias: str | None) -> MarshalField:
+        """
+        Same as :py:meth:`.convert_field`, but also adds an ``alias`` to the field
+        """
+        field = cls.convert_field(raw_field)
+        field.alias = alias
+        return field
+
+    @classmethod
+    def convert_fields(
+        cls,
+        *fields: Any,
+        **aliased_fields: Any,
+    ) -> Iterator[MarshalField]:
+        """
+        Converts all arguments into :py:class:`MarshalField`s
+        via :py:meth:`.convert_field` and :py:meth:`.convert_aliased_field`
+
+        :param fields: un-aliased positional arguments for fields, can be tuples
+        :param aliased_fields: same as fields, but keys are used as aliases
+        :return: yields resulting MappedFields one by one
+        :raises RuntimeError: if conversion of one of the fields fails
+        """
+        yield from (cls.convert_field(field) for field in fields)
+        yield from (
+            cls.convert_aliased_field(field, alias)
+            for alias, field in aliased_fields.items()
+        )
 
     model_base_class: ClassVar[type[BaseModel]] = MarshalBaseModel
     """Base model class. Subclasses of :py:class:`MarshalBaseModel` are recommended"""
