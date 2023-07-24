@@ -4,6 +4,8 @@
 venv/
 env/
 
+dist/
+
 .coverage/
 .mypy_cache/
 .pytest_cache/
