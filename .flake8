@@ -1,6 +1,6 @@
 [flake8]
 # config
-test-func-name-validator-regex = "test_.*"
+test-func-name-validator-regex = test_.*
 
 suppress-dummy-args = true
 
@@ -20,9 +20,14 @@ extend-ignore =
   # black
   WPS348
   # weird
-  PIE803 C101 FNE008
+  PIE803 C101 FNE008 ANN101 ANN102
   # broken
-  PIE798 WPS226 WPS354
+  PIE798 WPS226 WPS354 RST304
+  WPS322 WPS428 WPS462  # fails for class-attribute docstrings
+  U100  # fails to understand `raise NotImplementedError`
+
+  # too many
+  WPS214
 
   # don't block features
   WPS305  # f-strings are the best
@@ -32,4 +37,5 @@ extend-ignore =
   WPS501  # try-finally with no except
   WPS600  # subclassing lowercase builtins
   WPS602  # @staticmethod
+  WPS604  # some cringe /w banning constructions, including `pass`
   WPS605  # methods with no arguments
