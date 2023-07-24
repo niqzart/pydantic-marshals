@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Self
 
+from pydantic import BaseModel
+
 from pydantic_marshals.fields.properties import PropertyField, PropertyType
 from pydantic_marshals.fields.sqlalchemy.columns import ColumnField, ColumnType
 from pydantic_marshals.fields.sqlalchemy.relationships import (
@@ -38,10 +40,11 @@ class MappedModel(MarshalModel):
         columns: Sequence[ColumnType] = (),
         relationships: Sequence[RelationshipType] = (),
         properties: Sequence[PropertyType] = (),
+        bases: Sequence[type[BaseModel]] = (),
     ) -> Self:
         return cls(
             *cls.convert_fields(columns),
             *cls.convert_fields(relationships),
             *cls.convert_fields(properties),
-            bases=[],
+            bases=list(bases),
         )
