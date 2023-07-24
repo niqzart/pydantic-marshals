@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pydantic-marshals-sqlalchemy-example"
-version = "0.1.6"
+version = "0.1.7"
 description = ""
 authors = ["niqzart <niqzart@gmail.com>"]
 readme = "README.md"
@@ -9,7 +9,7 @@ packages = [{include = "pydantic_marshals_sqlalchemy_example"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 mypy = "^1.4.1"
-pydantic-marshals = {extras = ["sqlalchemy"], version = "0.1.6"}
+pydantic-marshals = {extras = ["sqlalchemy"], version = "0.1.7"}
 
 [tool.mypy]
 plugins = "pydantic_marshals.mypy.plugin"
