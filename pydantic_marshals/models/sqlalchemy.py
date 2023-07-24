@@ -4,6 +4,10 @@ from collections.abc import Sequence
 from typing import Self
 
 from pydantic_marshals.fields.sqlalchemy.columns import ColumnField, ColumnType
+from pydantic_marshals.fields.sqlalchemy.relationships import (
+    RelationshipField,
+    RelationshipType,
+)
 from pydantic_marshals.models.base import MarshalModel
 
 
@@ -13,19 +17,25 @@ class MappedModel(MarshalModel):
     (ORM style) table definitions (i.e. classes inherited from `Base`).
 
     Right now it can accept and convert into fields:
-    - columns
+    - columns (constructed with ``mapped_column()``)
+    - relationships (constructed with ``relationship()``)
 
     An alternative constructor :py:meth:`create` is available to make this happen
     """
 
-    field_types = (ColumnField,)
+    field_types = (
+        ColumnField,
+        RelationshipField,
+    )
 
     @classmethod
     def create(
         cls,
         columns: Sequence[ColumnType] = (),
+        relationships: Sequence[RelationshipType] = (),
     ) -> Self:
         return cls(
             *cls.convert_fields(columns),
+            *cls.convert_fields(relationships),
             bases=[],
         )
