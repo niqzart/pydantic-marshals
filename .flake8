@@ -18,13 +18,14 @@ extend-ignore =
   D I FI TC Q U101 S101 WPS400
 
   # black
-  WPS348
+  WPS348 E302
   # weird
   PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111
   # broken
   PIE798 WPS226 WPS354 RST304
   WPS322 WPS428 WPS462  # fails for class-attribute docstrings
   U100  # fails to understand `raise NotImplementedError`
+  WPS110 VNE002  # screams at variables in overriden methods
 
   # too many
   WPS211 WPS214
@@ -40,3 +41,6 @@ extend-ignore =
   WPS602  # @staticmethod
   WPS604  # some cringe /w banning constructions, including `pass`
   WPS605  # methods with no arguments
+
+  # preferences
+  WPS337  # multiline conditions
