@@ -50,3 +50,19 @@ class MappedModel(MarshalModel):
             *(field for model in includes for field in model.fields),
             bases=list(bases),
         )
+
+    def extend(
+        self,
+        columns: Sequence[ColumnType] = (),
+        relationships: Sequence[RelationshipType] = (),
+        properties: Sequence[PropertyType] = (),
+        bases: Sequence[type[BaseModel]] = (),
+        includes: Sequence[MarshalModel] = (),
+    ) -> Self:
+        return self.create(
+            columns=columns,
+            relationships=relationships,
+            properties=properties,
+            bases=bases,
+            includes=(self, *includes),
+        )
