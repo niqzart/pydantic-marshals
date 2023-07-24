@@ -41,10 +41,12 @@ class MappedModel(MarshalModel):
         relationships: Sequence[RelationshipType] = (),
         properties: Sequence[PropertyType] = (),
         bases: Sequence[type[BaseModel]] = (),
+        includes: Sequence[MarshalModel] = (),
     ) -> Self:
         return cls(
             *cls.convert_fields(columns),
             *cls.convert_fields(relationships),
             *cls.convert_fields(properties),
+            *(field for model in includes for field in model.fields),
             bases=list(bases),
         )

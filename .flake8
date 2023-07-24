@@ -27,7 +27,7 @@ extend-ignore =
   U100  # fails to understand `raise NotImplementedError`
 
   # too many
-  WPS214
+  WPS211 WPS214
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
