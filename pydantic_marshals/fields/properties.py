@@ -4,7 +4,7 @@ from typing import Any, Self, get_type_hints
 from pydantic_marshals.fields.base import MarshalField
 
 
-class MarshalPropertyField(MarshalField):
+class PropertyField(MarshalField):
     """
     Implementation of :py:class:`MarshalField` to use with properties
     Can be used directly or with an added type_override
