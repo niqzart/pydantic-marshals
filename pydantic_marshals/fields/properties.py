@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Any, Self, get_type_hints
 
 from pydantic_marshals.fields.base import MarshalField
+from pydantic_marshals.utils import ModeledType
 
 
 class PropertyField(MarshalField):
@@ -39,3 +40,12 @@ class PropertyField(MarshalField):
         if self.type_override is not None:
             return self.type_override
         return get_type_hints(self.getter).get("return", Any)
+
+
+PropertyType = (
+    property
+    | ModeledType[property]
+    | Callable[[Any], Any]
+    | ModeledType[Callable[[Any], Any]]
+    | PropertyField
+)
