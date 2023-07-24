@@ -44,9 +44,9 @@ class MappedModel(MarshalModel):
         includes: Sequence[MarshalModel] = (),
     ) -> Self:
         return cls(
-            *cls.convert_fields(columns),
-            *cls.convert_fields(relationships),
-            *cls.convert_fields(properties),
+            *cls.convert_fields(*columns),
+            *cls.convert_fields(*relationships),
+            *cls.convert_fields(*properties),
             *(field for model in includes for field in model.fields),
             bases=list(bases),
         )
