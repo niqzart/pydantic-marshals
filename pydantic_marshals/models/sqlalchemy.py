@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Self
 
+from pydantic_marshals.fields.properties import PropertyField, PropertyType
 from pydantic_marshals.fields.sqlalchemy.columns import ColumnField, ColumnType
 from pydantic_marshals.fields.sqlalchemy.relationships import (
     RelationshipField,
@@ -19,6 +20,8 @@ class MappedModel(MarshalModel):
     Right now it can accept and convert into fields:
     - columns (constructed with ``mapped_column()``)
     - relationships (constructed with ``relationship()``)
+    - properties (constructed with built-in ``@property()``)
+    - properties with overriden type (see :py:class:`PropertyField`)
 
     An alternative constructor :py:meth:`create` is available to make this happen
     """
@@ -26,6 +29,7 @@ class MappedModel(MarshalModel):
     field_types = (
         ColumnField,
         RelationshipField,
+        PropertyField,
     )
 
     @classmethod
@@ -33,9 +37,11 @@ class MappedModel(MarshalModel):
         cls,
         columns: Sequence[ColumnType] = (),
         relationships: Sequence[RelationshipType] = (),
+        properties: Sequence[PropertyType] = (),
     ) -> Self:
         return cls(
             *cls.convert_fields(columns),
             *cls.convert_fields(relationships),
+            *cls.convert_fields(properties),
             bases=[],
         )
