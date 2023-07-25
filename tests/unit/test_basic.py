@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from pydantic_marshals.fields.base import MarshalField
+from pydantic_marshals.base.fields.base import MarshalField
 
 
 @pytest.mark.parametrize("alias", [None, "something"])

@@ -35,6 +35,7 @@ extend-ignore =
   WPS305  # f-strings are the best
   WPS306  # python 2.x is deprecated
   WPS420  # pass is a thing
+  WPS412  # __init__ for libs is required
   WPS430  # nested functions
   WPS501  # try-finally with no except
   WPS600  # subclassing lowercase builtins
@@ -44,3 +45,6 @@ extend-ignore =
 
   # preferences
   WPS337  # multiline conditions
+
+per-file-ignores =
+  __init__.py: F401

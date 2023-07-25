@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, MappedColumn
 from sqlalchemy.sql.schema import Column, ScalarElementColumnDefault
 from sqlalchemy.sql.sqltypes import String
 
-from pydantic_marshals.fields.base import MarshalField
+from pydantic_marshals.base.fields.base import MarshalField
 
 
 class ColumnField(MarshalField):

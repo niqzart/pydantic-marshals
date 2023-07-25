@@ -3,7 +3,7 @@ from typing import Any, ClassVar
 
 from pydantic import BaseModel, create_model
 
-from pydantic_marshals.fields.base import MarshalField
+from pydantic_marshals.base.fields.base import MarshalField
 
 
 class MarshalBaseModel(BaseModel, from_attributes=True, populate_by_name=True):

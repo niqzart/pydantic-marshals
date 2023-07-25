@@ -5,7 +5,7 @@ from typing import Any, Self
 from pydantic import BaseModel
 from sqlalchemy.orm import Mapped, Relationship
 
-from pydantic_marshals.fields.base import MarshalField
+from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.utils import ModeledType, is_subtype
 
 

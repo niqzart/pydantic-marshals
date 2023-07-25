@@ -5,10 +5,10 @@ from typing import Self
 
 from pydantic import BaseModel
 
-from pydantic_marshals.fields.properties import PropertyType
-from pydantic_marshals.fields.sqlalchemy.columns import ColumnType
-from pydantic_marshals.fields.sqlalchemy.relationships import RelationshipType
-from pydantic_marshals.models.base import MarshalModel
+from pydantic_marshals.base.fields.properties import PropertyType
+from pydantic_marshals.base.models import MarshalModel
+from pydantic_marshals.sqlalchemy.fields.columns import ColumnType
+from pydantic_marshals.sqlalchemy.fields.relationships import RelationshipType
 
 class MappedModelStub:
     @classmethod
