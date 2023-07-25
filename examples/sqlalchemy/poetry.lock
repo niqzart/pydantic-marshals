@@ -201,17 +201,19 @@ typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
 name = "pydantic-marshals"
-version = "0.1.4"
+version = "0.1.7"
 description = "Library for creating partial pydantic models (automatic converters) from different mappings"
 optional = false
-python-versions = ">=3.11,<4.0"
-files = [
-    {file = "pydantic_marshals-0.1.4-py3-none-any.whl", hash = "sha256:d148ad3ac23efe90db8b9a0223c4b20369740b6bae97b7dadb291a97311a7f0c"},
-    {file = "pydantic_marshals-0.1.4.tar.gz", hash = "sha256:024281295f51b4495aacec51b089b2c1f5182d5f91eac1f423ee75492a271551"},
-]
+python-versions = "^3.11"
+files = []
+develop = true
 
 [package.dependencies]
 pydantic = ">=2.0,<3.0"
+
+[package.source]
+type = "directory"
+url = "../.."
 
 [[package]]
 name = "typing-extensions"
@@ -227,4 +229,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "7dbe0490367d1f0527f5b9baa0193d592b3aab398e22311821154006caa38415"
+content-hash = "e6e521b1c33c62b32d4add6d431f9ea4d59e03d211d093d7035ff02b4e39b7db"

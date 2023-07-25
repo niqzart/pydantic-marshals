@@ -5,7 +5,7 @@ from json import dumps
 from sqlalchemy import ForeignKey, MetaData, String, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from pydantic_marshals.models.sqlalchemy import MappedModel
+from pydantic_marshals.sqlalchemy import MappedModel
 
 db_url: str = "sqlite+pysqlite:///:memory:"
 engine = create_engine(db_url, pool_recycle=280, echo=True)

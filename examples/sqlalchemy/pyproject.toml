@@ -9,7 +9,7 @@ packages = [{include = "pydantic_marshals_sqlalchemy_example"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 mypy = "^1.4.1"
-pydantic-marshals = {extras = ["sqlalchemy"], version = "0.1.7"}
+pydantic-marshals = {path = "../..", extras = ["sqlalchemy"], develop = true}
 
 [tool.mypy]
 plugins = "pydantic_marshals.mypy.plugin"
