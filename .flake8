@@ -18,7 +18,7 @@ extend-ignore =
   D I FI TC Q U101 S101 WPS400
 
   # black
-  WPS348 E302
+  WPS348 E302 C815
   # weird
   PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111
   # broken
@@ -28,7 +28,7 @@ extend-ignore =
   WPS110 VNE002  # screams at variables in overriden methods
 
   # too many
-  WPS211 WPS214
+  WPS211 WPS214 WPS212 WPS221
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
