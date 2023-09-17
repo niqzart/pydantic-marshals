@@ -7,6 +7,7 @@ from pydantic import ValidationError
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.models import FieldConverter
+from pydantic_marshals.base.type_aliases import FieldType, TypeHint
 from pydantic_marshals.contains.fields.constants import ConstantField
 from pydantic_marshals.contains.fields.lists import strict_list_field_factory
 from pydantic_marshals.contains.fields.nested import nested_field_factory
@@ -16,7 +17,7 @@ from pydantic_marshals.contains.fields.wildcards import (
     NothingField,
     SomethingField,
 )
-from pydantic_marshals.contains.type_aliases import FieldType, TypeChecker, TypeHint
+from pydantic_marshals.contains.type_aliases import TypeChecker
 
 
 class UniterModel(FieldConverter):

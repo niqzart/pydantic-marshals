@@ -4,7 +4,9 @@ from collections.abc import Iterator
 from typing import Any, Self
 
 from pydantic import BaseModel, RootModel
-from pydantic.fields import Field, FieldInfo
+from pydantic.fields import Field
+
+from pydantic_marshals.base.type_aliases import FieldType, TypeHint
 
 
 class MarshalField:
@@ -35,7 +37,7 @@ class MarshalField:
         """
         raise NotImplementedError
 
-    def generate_type(self) -> type:
+    def generate_type(self) -> TypeHint:
         """
         Generates the type annotation for the field, used in
         :py:meth:`pydantic_marshals.models.base.MarshalModel.generate_model`
@@ -54,7 +56,7 @@ class MarshalField:
         """
         yield "alias", self.alias
 
-    def generate_field(self) -> tuple[type, FieldInfo]:
+    def generate_field(self) -> FieldType:
         """
         Generates field info for the field, used in
         :py:meth:`pydantic_marshals.models.base.MarshalModel.generate_model`

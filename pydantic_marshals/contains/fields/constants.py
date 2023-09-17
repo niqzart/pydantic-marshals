@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Any, Literal, Self
 
 from pydantic_marshals.base.fields.base import MarshalField
-from pydantic_marshals.contains.type_aliases import LiteralType, TypeHint
+from pydantic_marshals.base.type_aliases import TypeHint
+from pydantic_marshals.contains.type_aliases import LiteralType
 
 
 class ConstantField(MarshalField):

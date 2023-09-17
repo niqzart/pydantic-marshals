@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Any, Self, get_type_hints
 
 from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.type_aliases import TypeHint
 from pydantic_marshals.utils import ModeledType
 
 
@@ -14,7 +15,7 @@ class PropertyField(MarshalField):
     def __init__(
         self,
         mapped_property: property,
-        type_override: type | None = None,
+        type_override: TypeHint | None = None,
         alias: str | None = None,
     ) -> None:
         super().__init__(alias)
@@ -24,6 +25,7 @@ class PropertyField(MarshalField):
     @classmethod
     def convert(cls, mapped: Any = None, type_: Any = None, *_: Any) -> Self | None:
         if isinstance(mapped, property) and (type_ is None or isinstance(type_, type)):
+            # TODO check type_ is a TypeHint?
             return cls(mapped, type_)
         return None
 
@@ -36,7 +38,7 @@ class PropertyField(MarshalField):
     def generate_name(self) -> str:
         return self.getter.__name__
 
-    def generate_type(self) -> type:
+    def generate_type(self) -> TypeHint:
         if self.type_override is not None:
             return self.type_override
         return get_type_hints(self.getter).get("return", Any)

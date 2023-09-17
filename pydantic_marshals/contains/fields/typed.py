@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Annotated, Any, Optional, Self, get_origin
 
 from pydantic_marshals.base.fields.base import MarshalField
-from pydantic_marshals.contains.type_aliases import TypeHint
+from pydantic_marshals.base.type_aliases import TypeHint
 
 
 class TypedField(MarshalField):

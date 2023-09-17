@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Mapped, Relationship
 
 from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.type_aliases import TypeHint
 from pydantic_marshals.utils import ModeledType, is_subtype
 
 
@@ -35,14 +36,14 @@ class RelationshipField(MarshalField):
     def generate_name(self) -> str:
         return self.relationship.key
 
-    def generate_type(self) -> type[BaseModel]:
+    def generate_type(self) -> TypeHint:
         collection_class = self.relationship.collection_class
         if collection_class is None:
             return self.model
         if not isinstance(collection_class, type):
             raise RuntimeError(f"Collection is not a type: {collection_class}")
         if issubclass(collection_class, list):
-            return list[self.model]  # type: ignore[return-value, name-defined]
+            return list[self.model]  # type: ignore[name-defined]
         raise RuntimeError(f"Bad collection class: {collection_class}")
 
 

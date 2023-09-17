@@ -7,7 +7,8 @@ from typing import Any, Self
 from pydantic import BaseModel, create_model
 
 from pydantic_marshals.base.fields.base import MarshalField
-from pydantic_marshals.contains.type_aliases import FieldType, TypeChecker, TypeHint
+from pydantic_marshals.base.type_aliases import FieldType, TypeHint
+from pydantic_marshals.contains.type_aliases import TypeChecker
 
 
 def nested_field_factory(  # noqa: N802

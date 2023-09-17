@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any, Optional, Self
+from typing import Any, Self
 from warnings import warn
 
 from pydantic_core import PydanticUndefined, PydanticUndefinedType
@@ -10,6 +10,7 @@ from sqlalchemy.sql.schema import Column, ScalarElementColumnDefault
 from sqlalchemy.sql.sqltypes import String
 
 from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.type_aliases import TypeHint
 
 
 class ColumnField(MarshalField):
@@ -39,10 +40,10 @@ class ColumnField(MarshalField):
     def generate_name(self) -> str:
         return self.column.name
 
-    def generate_type(self) -> type:
-        type_ = self.column.type.python_type
+    def generate_type(self) -> TypeHint:
+        type_: TypeHint = self.column.type.python_type
         if self.column.nullable:
-            return Optional[type_]  # type: ignore[return-value]  # noqa: NU002
+            return type_ | None  # noqa: WPS465
         return type_
 
     def generate_default(self) -> Any | None | PydanticUndefinedType:
