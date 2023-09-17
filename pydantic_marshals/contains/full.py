@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from enum import Enum
 from types import EllipsisType
-from typing import Any, Literal, TypeAlias
+from typing import Annotated, Any, Literal, Optional, TypeAlias, get_origin
 
-from pydantic import Field, ValidationError, create_model
-from pydantic.fields import FieldInfo
-from pydantic_core import PydanticUndefined
+from pydantic import BaseModel, RootModel, ValidationError, create_model
+from pydantic.fields import Field, FieldInfo
 
 # TODO put all of this in a MarshalField (mb think about a Model, minimalist-style)
 
@@ -29,10 +29,14 @@ TypeChecker: TypeAlias = (
 FieldType: TypeAlias = tuple[TypeHint, FieldInfo]
 
 
-def convert_to_type(source: TypeChecker) -> TypeHint:
-    # TODO somehow support Optional[{"hey": 1}] (and may be Union aka OR? via set?)
-    # TODO port new features to ffs whenever possible
+def convert_model(source: dict[str, TypeChecker]) -> type[BaseModel]:
+    fields: dict[str, FieldType] = {
+        key: convert_field(value) for key, value in source.items()
+    }
+    return create_model("Model", **fields)  # type: ignore[call-overload, no-any-return]
 
+
+def convert_type(source: TypeChecker) -> TypeHint:
     if source is None:
         return type(None)
     if source is ... or source is Any:
@@ -43,37 +47,34 @@ def convert_to_type(source: TypeChecker) -> TypeHint:
     if isinstance(source, type):
         return source
     if isinstance(source, dict):
-        fields: dict[str, FieldType] = {
-            key: convert_to_field(value) for key, value in source.items()
-        }
-        return create_model("Model", **fields)  # type: ignore[call-overload]
+        return convert_model(source)
     if isinstance(source, list):
         return tuple[  # type: ignore[misc]
-            *(convert_to_field(value) for value in source)  # noqa: WPS356 (bug in WPS)
+            *(convert_type(value) for value in source)  # noqa: WPS356 (bug in WPS)
         ]
+    if get_origin(source) in {Annotated, Optional}:
+        return source
     raise RuntimeError(f"Can't convert {source} to a type")
 
 
-def convert_to_default(source: TypeChecker) -> Any | None:
+def convert_field_data(source: TypeChecker) -> Iterator[tuple[str, Any]]:
     if source is None or source is Any:
-        return None
-    return PydanticUndefined
+        yield "default", None
 
 
-def convert_to_field(source: TypeChecker) -> FieldType:
-    return convert_to_type(source), Field(default=convert_to_default(source))
-    # TODO default=None for Anything but not Something in v2
+def convert_field(source: TypeChecker) -> FieldType:
+    return (
+        convert_type(source),
+        Field(**dict(convert_field_data(source))),
+    )
 
 
-def check_contains(real: Any, expected: TypeChecker, field_name: str) -> None:
-    create_model(  # type: ignore[call-overload]
-        "Model",
-        **{field_name: convert_to_field(expected)},
-    ).model_validate({field_name: real})
+def build_contains_model(source: TypeChecker) -> type[BaseModel]:
+    return RootModel[convert_field(source)[0]]  # type: ignore[no-any-return, misc]
 
 
 def assert_contains(real: Any, expected: TypeChecker) -> None:
     try:
-        create_model("Model", __root__=convert_to_field(expected)).model_validate(real)
+        build_contains_model(expected).model_validate(real)
     except ValidationError as e:
         raise AssertionError(str(e))
