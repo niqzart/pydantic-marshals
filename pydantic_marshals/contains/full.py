@@ -10,7 +10,7 @@ from pydantic import BaseModel, ValidationError, create_model
 from pydantic.fields import FieldInfo
 
 from pydantic_marshals.base.fields.base import MarshalField
-from pydantic_marshals.base.models import MarshalModel
+from pydantic_marshals.base.models import FieldConverter
 
 # TODO put all of this in a MarshalField (mb think about a Model, minimalist-style)
 
@@ -149,7 +149,7 @@ def strict_list_field_factory(
     return StrictListFieldInner
 
 
-class UniterModel(MarshalModel):  # TODO only ``convert_field`` is needed
+class UniterModel(FieldConverter):
     field_types = (
         NothingField,
         SomethingField,

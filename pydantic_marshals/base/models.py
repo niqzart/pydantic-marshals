@@ -10,13 +10,7 @@ class MarshalBaseModel(BaseModel, from_attributes=True, populate_by_name=True):
     pass
 
 
-class MarshalModel:
-    """
-    Basic boilerplate class for all pydantic-marshals models.
-    This is a complete class, but it could be extended with alternative constructors,
-    updated base model, new runtime methods or auto-converters for fields
-    """
-
+class FieldConverter:
     field_types: tuple[type[MarshalField], ...] = ()
     """Field types to be used in :py:meth:`convert_field`"""
 
@@ -30,22 +24,6 @@ class MarshalModel:
 
     def __init_subclass__(cls, **_: Any) -> None:
         cls.field_types = (*cls.field_types, *cls.dynamic_field_types())
-
-    def __init__(
-        self,
-        *fields: MarshalField,
-        bases: list[type[BaseModel]],
-    ) -> None:
-        """
-        :param fields: fields to include in the model
-        :param bases: pydantic bases to add to the model
-        """
-        self.fields: list[MarshalField] = list(fields)
-        self.bases: list[type[BaseModel]] = bases
-        self._generated_model: type[BaseModel] | None = None
-
-    def __set_name__(self, owner: type, name: str) -> None:
-        self.model_name: str = f"{owner.__qualname__}.{name}"
 
     @classmethod
     def convert_field(cls, raw_field: Any) -> MarshalField:
@@ -95,6 +73,30 @@ class MarshalModel:
             cls.convert_aliased_field(field, alias)
             for alias, field in aliased_fields.items()
         )
+
+
+class MarshalModel(FieldConverter):
+    """
+    Basic boilerplate class for all pydantic-marshals models.
+    This is a complete class, but it could be extended with alternative constructors,
+    updated base model, new runtime methods or auto-converters for fields
+    """
+
+    def __init__(
+        self,
+        *fields: MarshalField,
+        bases: list[type[BaseModel]],
+    ) -> None:
+        """
+        :param fields: fields to include in the model
+        :param bases: pydantic bases to add to the model
+        """
+        self.fields: list[MarshalField] = list(fields)
+        self.bases: list[type[BaseModel]] = bases
+        self._generated_model: type[BaseModel] | None = None
+
+    def __set_name__(self, owner: type, name: str) -> None:
+        self.model_name: str = f"{owner.__qualname__}.{name}"
 
     model_base_class: ClassVar[type[BaseModel]] = MarshalBaseModel
     """Base model class. Subclasses of :py:class:`MarshalBaseModel` are recommended"""
