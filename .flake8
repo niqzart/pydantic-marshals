@@ -28,7 +28,7 @@ extend-ignore =
   WPS110 VNE002  # screams at variables in overriden methods
 
   # too many
-  WPS211 WPS214 WPS212 WPS221 WPS227
+  WPS201 WPS211 WPS214 WPS212 WPS221 WPS227
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
