@@ -11,6 +11,11 @@ from pydantic_core import PydanticUndefined
 # TODO put all of this in a MarshalField (mb think about a Model, minimalist-style)
 
 # TODO TypingGenericAlias = type(Literal[int]).__base__ (or .__base__ of that)
+TypeHint = Any
+# TODO ``from types import UnionType, GenericAlias`` to allow `int | None` & such
+# TODO ``type(Literal[int]).__base__`` to allow type-hints from typing
+# TODO add both things from above to the return type (also in base.fields.base)
+#   https://stackoverflow.com/questions/73763352/how-do-i-type-hint-a-variable-whose-value-is-itself-a-type-hint
 LiteralType: TypeAlias = int | str | bool | float | Enum
 TypeChecker: TypeAlias = (
     None  # noqa: WPS465
@@ -21,35 +26,29 @@ TypeChecker: TypeAlias = (
     | LiteralType
     | EllipsisType
 )
-FieldType: TypeAlias = tuple[type, FieldInfo]
+FieldType: TypeAlias = tuple[TypeHint, FieldInfo]
 
 
-def convert_to_type(source: TypeChecker) -> type:
+def convert_to_type(source: TypeChecker) -> TypeHint:
     # TODO somehow support Optional[{"hey": 1}] (and may be Union aka OR? via set?)
-    # TODO ``from types import UnionType, GenericAlias`` to allow `int | None` & such
-    # TODO ``type(Literal[int]).__base__`` to allow type-hints from typing
-    # TODO add both things from above to the return type (also in base.fields.base)
-    #   https://stackoverflow.com/questions/73763352/how-do-i-type-hint-a-variable-whose-value-is-itself-a-type-hint
     # TODO port new features to ffs whenever possible
 
     if source is None:
         return type(None)
     if source is ... or source is Any:
-        return Any  # type: ignore
+        return Any
     if isinstance(source, LiteralType):  # type: ignore[misc, arg-type]
         # https://github.com/python/mypy/issues/12155 ^^^^^^^^^^^^^^^^^
-        return Literal[source]  # type: ignore
+        return Literal[source]
     if isinstance(source, type):
         return source
     if isinstance(source, dict):
         fields: dict[str, FieldType] = {
             key: convert_to_field(value) for key, value in source.items()
         }
-        return create_model(  # type: ignore[no-any-return, call-overload]
-            "Model", **fields
-        )
+        return create_model("Model", **fields)  # type: ignore[call-overload]
     if isinstance(source, list):
-        return tuple[  # type: ignore[no-any-return, misc]
+        return tuple[  # type: ignore[misc]
             *(convert_to_field(value) for value in source)  # noqa: WPS356 (bug in WPS)
         ]
     raise RuntimeError(f"Can't convert {source} to a type")
