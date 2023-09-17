@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pydantic-marshals-assert-contains-example"
+version = "0.1.7"
+description = ""
+authors = ["niqzart <niqzart@gmail.com>"]
+readme = "README.md"
+packages = [{include = "pydantic_marshals_assert_contains_example"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+mypy = "^1.4.1"
+pydantic-marshals = {path = "../..", extras = ["assert-contains"], develop = true}
+
+[tool.mypy]
+plugins = "pydantic_marshals.mypy.plugin"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
