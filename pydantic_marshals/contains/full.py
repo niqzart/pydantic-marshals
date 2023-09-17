@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from types import EllipsisType
 from typing import Any, Literal, TypeAlias
 
 from pydantic import Field, ValidationError, create_model
@@ -18,7 +19,7 @@ TypeChecker: TypeAlias = (
     | list
     | type[LiteralType]
     | LiteralType
-    | ellipsis  # noqa: F821 (ellipsis is defined)
+    | EllipsisType
 )
 FieldType: TypeAlias = tuple[type, FieldInfo]
 
@@ -49,7 +50,7 @@ def convert_to_type(source: TypeChecker) -> type:
         )
     if isinstance(source, list):
         return tuple[  # type: ignore[no-any-return, misc]
-            (convert_to_field(value) for value in source)
+            *(convert_to_field(value) for value in source)  # noqa: WPS356 (bug in WPS)
         ]
     raise RuntimeError(f"Can't convert {source} to a type")
 
