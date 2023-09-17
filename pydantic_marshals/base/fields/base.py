@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from typing import Any, Self
 
+from pydantic import BaseModel, RootModel
 from pydantic.fields import Field, FieldInfo
 
 
@@ -62,3 +63,6 @@ class MarshalField:
             self.generate_type(),
             Field(**dict(self.generate_field_data())),
         )
+
+    def generate_root_model(self) -> type[BaseModel]:
+        return RootModel[self.generate_type()]  # type: ignore[no-any-return, misc]
