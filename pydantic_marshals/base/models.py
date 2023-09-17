@@ -20,6 +20,17 @@ class MarshalModel:
     field_types: tuple[type[MarshalField], ...] = ()
     """Field types to be used in :py:meth:`convert_field`"""
 
+    @classmethod
+    def dynamic_field_types(cls) -> Iterator[type[MarshalField]]:
+        """
+        Same as :py:attr:`field_types`, but these could be dynamically generated.
+        Generated values would be added to the end of `field_types`
+        """
+        yield from ()  # noqa: WPS353
+
+    def __init_subclass__(cls, **_: Any) -> None:
+        cls.field_types = (*cls.field_types, *cls.dynamic_field_types())
+
     def __init__(
         self,
         *fields: MarshalField,

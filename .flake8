@@ -20,7 +20,7 @@ extend-ignore =
   # black
   WPS348 E302 C815
   # weird
-  PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111
+  PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111 WPS338
   # broken
   PIE798 WPS226 WPS354 RST304
   WPS322 WPS428 WPS462  # fails for class-attribute docstrings
@@ -28,7 +28,7 @@ extend-ignore =
   WPS110 VNE002  # screams at variables in overriden methods
 
   # too many
-  WPS211 WPS214 WPS212 WPS221
+  WPS211 WPS214 WPS212 WPS221 WPS227
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
@@ -37,6 +37,7 @@ extend-ignore =
   WPS420  # pass is a thing
   WPS412  # __init__ for libs is required
   WPS430  # nested functions
+  WPS431  # nested classes
   WPS501  # try-finally with no except
   WPS600  # subclassing lowercase builtins
   WPS602  # @staticmethod

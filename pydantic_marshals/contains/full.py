@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
+from contextlib import suppress
 from enum import Enum
 from types import EllipsisType
 from typing import Annotated, Any, Literal, Optional, Self, TypeAlias, get_origin
 
-from pydantic import ValidationError, create_model
+from pydantic import BaseModel, ValidationError, create_model
 from pydantic.fields import FieldInfo
 
 from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.models import MarshalModel
 
 # TODO put all of this in a MarshalField (mb think about a Model, minimalist-style)
 
@@ -31,59 +33,152 @@ TypeChecker: TypeAlias = (
 FieldType: TypeAlias = tuple[TypeHint, FieldInfo]
 
 
-class ContainsField(MarshalField):
-    def __init__(self, source: TypeChecker) -> None:
+class NothingField(MarshalField):
+    @classmethod
+    def convert(cls, source: Any = None, *_: Any) -> Self | None:
+        if source is None:
+            return cls()
+        return None
+
+    def generate_type(self) -> TypeHint:
+        return type(None)
+
+    def generate_field_data(self) -> Iterator[tuple[str, Any]]:
+        yield "default", None
+
+
+class SomethingField(MarshalField):
+    @classmethod
+    def convert(cls, source: Any = None, *_: Any) -> Self | None:
+        if source is ...:
+            return cls()
+        return None
+
+    def generate_type(self) -> TypeHint:
+        return Any
+
+
+class AnythingField(MarshalField):
+    @classmethod
+    def convert(cls, source: Any = None, *_: Any) -> Self | None:
+        if source is Any:
+            return cls()
+        return None
+
+    def generate_type(self) -> TypeHint:
+        return Any
+
+    def generate_field_data(self) -> Iterator[tuple[str, Any]]:
+        yield "default", None
+
+
+class ConstantField(MarshalField):
+    def __init__(self, constant: LiteralType) -> None:
         super().__init__()
-        self.source = source
+        self.constant = constant
 
     @classmethod
-    def convert(cls, source: TypeChecker = None, *_: Any) -> Self | None:
-        # TODO `isinstance(source, TypeChecker)`
-        return cls(source)
+    def convert(cls, constant: Any = None, *_: Any) -> Self | None:
+        if isinstance(constant, LiteralType):  # type: ignore[misc, arg-type]
+            # https://github.com/python/mypy/issues/12155 ^^^^^^^^^^^^^^^^^^^^^^
+            return cls(constant)
+        return None
 
-    # TODO generate_name?
+    def generate_type(self) -> TypeHint:
+        # noinspection PyTypeHints
+        return Literal[self.constant]  # pycharm bug
+
+
+class TypedField(MarshalField):
+    def __init__(self, type_: TypeHint) -> None:  # TODO optional
+        super().__init__()
+        self.type_ = type_
+
+    @classmethod
+    def convert(cls, source: Any = None, *_: Any) -> Self | None:
+        if isinstance(source, type) or get_origin(source) in {Annotated, Optional}:
+            return cls(source)
+        return None
+
+    def generate_type(self) -> TypeHint:
+        return self.type_
+
+
+def nested_field_factory(  # noqa: N802
+    convert_field: Callable[[TypeChecker], FieldType],
+) -> type[MarshalField]:
+    class NestedFieldInner(MarshalField):
+        def __init__(self, model: type[BaseModel]) -> None:
+            super().__init__()
+            self.model = model
+
+        @classmethod
+        def convert(cls, source: Any = None, *_: Any) -> Self | None:
+            if isinstance(source, dict):
+                with suppress(RuntimeError):
+                    fields: dict[str, FieldType] = {
+                        key: convert_field(value) for key, value in source.items()
+                    }
+                    return cls(
+                        create_model("Model", **fields),  # type: ignore[call-overload]
+                    )
+            return None
+
+        def generate_type(self) -> TypeHint:
+            return self.model
+
+    return NestedFieldInner
+
+
+def strict_list_field_factory(
+    convert_type: Callable[[TypeChecker], TypeHint],
+) -> type[MarshalField]:
+    class StrictListFieldInner(TypedField):
+        @classmethod
+        def convert(cls, source: Any = None, *_: Any) -> Self | None:
+            if isinstance(source, list):
+                return cls(
+                    tuple[  # type: ignore[misc]
+                        *(  # noqa: WPS356 (bug in WPS)
+                            convert_type(value) for value in source
+                        )
+                    ],
+                )
+            return None
+
+    return StrictListFieldInner
+
+
+class UniterModel(MarshalModel):  # TODO only ``convert_field`` is needed
+    field_types = (
+        NothingField,
+        SomethingField,
+        AnythingField,
+        ConstantField,
+        TypedField,
+    )
+
+    @classmethod
+    def dynamic_field_types(cls) -> Iterator[type[MarshalField]]:
+        yield nested_field_factory(cls.convert_to_field)
+        yield strict_list_field_factory(cls.convert_to_type)
 
     @classmethod
     def convert_to_type(cls, source: TypeChecker) -> TypeHint:
-        return cls(source).generate_type()
+        return cls.convert_field(source).generate_type()
 
     @classmethod
-    def convert_to_field(cls, source: TypeChecker) -> TypeHint:
-        return cls(source).generate_field()
+    def convert_to_field(cls, source: TypeChecker) -> FieldType:
+        return cls.convert_field(source).generate_field()
 
-    def generate_type(self) -> TypeHint:
-        if self.source is None:
-            return type(None)
-        if self.source is ... or self.source is Any:
-            return Any
-        if isinstance(self.source, LiteralType):  # type: ignore[misc, arg-type]
-            # https://github.com/python/mypy/issues/12155 ^^^^^^^^^^^^^^^^^
-            return Literal[self.source]
-        if isinstance(self.source, type):
-            return self.source
-        if isinstance(self.source, dict):
-            fields: dict[str, FieldType] = {
-                key: self.convert_to_field(value) for key, value in self.source.items()
-            }
-            return create_model("Model", **fields)  # type: ignore[call-overload]
-        if isinstance(self.source, list):
-            return tuple[  # type: ignore[misc]
-                *(  # noqa: WPS356 (bug in WPS)
-                    self.convert_to_type(value) for value in self.source
-                )
-            ]
-        if get_origin(self.source) in {Annotated, Optional}:
-            return self.source
-        raise RuntimeError(f"Can't convert {self.source!r} to a type")
-
-    def generate_field_data(self) -> Iterator[tuple[str, Any]]:
-        if self.source is None or self.source is Any:
-            yield "default", None
+    @classmethod
+    def contains(cls, real: Any, expected: TypeChecker) -> None:
+        cls.convert_field(expected).generate_root_model().model_validate(real)
 
 
 def assert_contains(real: Any, expected: TypeChecker) -> None:
     try:
-        ContainsField(expected).generate_root_model().model_validate(real)
+        UniterModel.contains(real, expected)
     except ValidationError as e:
         raise AssertionError(str(e))
 
