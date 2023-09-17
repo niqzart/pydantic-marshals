@@ -1,15 +1,21 @@
 from __future__ import annotations
 
-from typing import Any, TypeAlias
+from types import GenericAlias, UnionType
+from typing import Any, Literal, TypeAlias
 
 from pydantic.fields import FieldInfo
 
-# TODO TypingGenericAlias = type(Literal[int]).__base__ (or .__base__ of that)
-
-TypeHint = Any
-# TODO ``from types import UnionType, GenericAlias`` to allow `int | None` & such
-# TODO ``type(Literal[int]).__base__`` to allow type-hints from typing
-# TODO add both things from above to the return type (also in base.fields.base)
-#   https://stackoverflow.com/questions/73763352/how-do-i-type-hint-a-variable-whose-value-is-itself-a-type-hint
+BaseGenericAlias: TypeAlias = type(  # type: ignore[name-defined]
+    Literal[0],
+).__base__.__base__
+SpecialForm: TypeAlias = type(Any)  # type: ignore[valid-type]
+TypeHint: TypeAlias = (
+    type  # type: ignore[valid-type]
+    | GenericAlias
+    | UnionType
+    | BaseGenericAlias
+    | SpecialForm
+    | type(None)
+)
 
 FieldType: TypeAlias = tuple[TypeHint, FieldInfo]

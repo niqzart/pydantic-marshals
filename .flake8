@@ -18,7 +18,7 @@ extend-ignore =
   D I FI TC Q U101 S101 WPS400
 
   # black
-  WPS348 E302 C815
+  WPS348 WPS464 E302 C815
   # weird
   PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111 WPS338
   # broken
@@ -26,9 +26,11 @@ extend-ignore =
   WPS322 WPS428 WPS462  # fails for class-attribute docstrings
   U100  # fails to understand `raise NotImplementedError`
   WPS110 VNE002  # screams at variables in overriden methods
+  WPS115  # enums use upper-case constants in classes
+  WPS465  # fails for pipe-union types (bitwise |)
 
   # too many
-  WPS201 WPS211 WPS214 WPS212 WPS221 WPS227
+  WPS201 WPS211 WPS214 WPS212 WPS221 WPS227 WPS235
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
@@ -49,3 +51,4 @@ extend-ignore =
 
 per-file-ignores =
   __init__.py: F401
+  *test*: SCS108 VNE001
