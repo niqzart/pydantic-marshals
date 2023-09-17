@@ -45,6 +45,9 @@ wemake-python-styleguide = "^0.17.0"
 [tool.poetry.group.sqlaclhemy.dependencies]
 sqlalchemy = ">=2.0,<3.0"
 
+
+[tool.poetry.group.assert-contains.dependencies]
+
 [tool.isort]
 profile = "black"
 py_version = 311

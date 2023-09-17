@@ -20,7 +20,7 @@ from pydantic_marshals.contains.fields.wildcards import (
 from pydantic_marshals.contains.type_aliases import TypeChecker
 
 
-class UniterModel(FieldConverter):
+class AssertContainsModel(FieldConverter):
     field_types = (
         NothingField,
         SomethingField,
@@ -49,40 +49,6 @@ class UniterModel(FieldConverter):
 
 def assert_contains(real: Any, expected: TypeChecker) -> None:
     try:
-        UniterModel.contains(real, expected)
+        AssertContainsModel.contains(real, expected)
     except ValidationError as e:
         raise AssertionError(str(e)) from None
-
-
-if __name__ == "__main__":
-    from pydantic import conlist  # noqa: WPS433
-
-    checker = {
-        "a": "3",
-        "b": 3,
-        "c": [{"d": int, "e": None}],
-        "d": conlist(item_type=str),
-        "e": {"g": str, "b": ..., "e": Any},
-    }
-
-    assert_contains(
-        {
-            "a": "3",
-            "b": 3,
-            "c": [{"d": 4}],
-            "d": ["str", "wow"],
-            "e": {"g": "ger", "b": object()},
-        },
-        checker,
-    )
-
-    assert_contains(
-        {
-            "a": "5",
-            "b": 6,
-            "c": [{"d": "4", "e": 4}],
-            "d": ["str", 3, object()],
-            "e": {"g": 5},
-        },
-        checker,
-    )
