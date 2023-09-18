@@ -105,3 +105,17 @@ if __name__ == "__main__":
     t1(T)
 
     print(dumps(T.model_json_schema(), indent=2))
+
+    u = User(
+        id=3,
+        name="hey",
+        a=1,
+        b=2,
+        c=4,
+        e=E.A,
+        d1=date.today(),
+        d2=datetime.utcnow(),
+        avatar_id="hey",
+        avatar={"id": 0},
+    )
+    print(User.FullModel.model_validate(u).model_dump_json())
