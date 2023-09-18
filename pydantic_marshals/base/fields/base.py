@@ -54,7 +54,8 @@ class MarshalField:
         Kwarg names and types can be found in
         :py:class:`pydantic.fields._FieldInfoInputs`
         """
-        yield "alias", self.alias
+        if self.alias is not None:
+            yield "alias", self.alias
 
     def generate_field(self) -> FieldType:
         """
