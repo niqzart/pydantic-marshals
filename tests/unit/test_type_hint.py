@@ -6,6 +6,7 @@ import pytest
 from pydantic import BaseModel
 
 from pydantic_marshals.base.type_aliases import TypeHint
+from tests.unit.conftest import SampleEnum
 
 
 @pytest.mark.parametrize(
@@ -50,10 +51,6 @@ from pydantic_marshals.base.type_aliases import TypeHint
 )
 def test_correct_type_hits(type_hint: typing.Any) -> None:
     assert isinstance(type_hint, TypeHint)
-
-
-class SampleEnum(Enum):
-    A = 1
 
 
 @pytest.mark.parametrize(

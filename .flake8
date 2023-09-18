@@ -30,7 +30,7 @@ extend-ignore =
   WPS465  # fails for pipe-union types (bitwise |)
 
   # too many
-  WPS201 WPS210 WPS211 WPS214 WPS212 WPS221 WPS227 WPS235
+  WPS201 WPS210 WPS211 WPS214 WPS218 WPS212 WPS221 WPS227 WPS235
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
@@ -51,4 +51,4 @@ extend-ignore =
 
 per-file-ignores =
   __init__.py: F401
-  *test*: SCS108 VNE001
+  *test*: SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS442 WPS520

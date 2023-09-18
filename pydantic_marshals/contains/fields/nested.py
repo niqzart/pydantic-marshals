@@ -4,21 +4,18 @@ from collections.abc import Callable
 from contextlib import suppress
 from typing import Any, Self
 
-from pydantic import BaseModel, create_model
+from pydantic import create_model
 
 from pydantic_marshals.base.fields.base import MarshalField
-from pydantic_marshals.base.type_aliases import FieldType, TypeHint
+from pydantic_marshals.base.type_aliases import FieldType
+from pydantic_marshals.contains.fields.typed import TypedField
 from pydantic_marshals.contains.type_aliases import TypeChecker
 
 
 def nested_field_factory(  # noqa: N802
     convert_field: Callable[[TypeChecker], FieldType],
 ) -> type[MarshalField]:
-    class NestedFieldInner(MarshalField):
-        def __init__(self, model: type[BaseModel]) -> None:
-            super().__init__()
-            self.model = model
-
+    class NestedFieldInner(TypedField):
         @classmethod
         def convert(cls, source: Any = None, *_: Any) -> Self | None:
             if isinstance(source, dict):
@@ -30,8 +27,5 @@ def nested_field_factory(  # noqa: N802
                         create_model("Model", **fields),  # type: ignore[call-overload]
                     )
             return None
-
-        def generate_type(self) -> TypeHint:
-            return self.model
 
     return NestedFieldInner

@@ -13,7 +13,11 @@ class TypedField(MarshalField):
 
     @classmethod
     def convert(cls, source: Any = None, *_: Any) -> Self | None:
-        if isinstance(source, type) or get_origin(source) in {Annotated, Optional}:
+        if (
+            source is not Any
+            and isinstance(source, type)
+            or get_origin(source) in {Annotated, Optional}
+        ):
             return cls(source)
         return None
 
