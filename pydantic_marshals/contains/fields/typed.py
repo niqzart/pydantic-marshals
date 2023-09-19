@@ -4,6 +4,7 @@ from typing import Annotated, Any, Optional, Self, get_origin
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.type_aliases import TypeHint
+from pydantic_marshals.contains.type_generators.base import BaseTypeGenerator
 
 
 class TypedField(MarshalField):
@@ -23,3 +24,11 @@ class TypedField(MarshalField):
 
     def generate_type(self) -> TypeHint:
         return self.type_
+
+
+class GeneratedTypeField(TypedField):
+    @classmethod
+    def convert(cls, source: Any = None, *_: Any) -> Self | None:
+        if isinstance(source, BaseTypeGenerator):
+            return cls(source.to_typehint())
+        return None

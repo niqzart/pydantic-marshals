@@ -27,8 +27,8 @@ def convert_field_mock_to_sample(sample_field: typed.TypedField) -> Iterator[Moc
         yield mock
 
 
-NestedField = AssertContainsModel.field_types[5]  # type: ignore[misc]
-StrictListField = AssertContainsModel.field_types[6]  # type: ignore[misc]
+NestedField = AssertContainsModel.field_types[6]  # type: ignore[misc]
+StrictListField = AssertContainsModel.field_types[7]  # type: ignore[misc]
 
 SOURCE_TO_KLASS: list[Any] = [
     pytest.param(None, wildcards.NothingField, id="none-nothing"),
@@ -56,6 +56,11 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param({}, NestedField, id="empty-nested"),
     pytest.param({"a": 1}, NestedField, id="single-nested"),
     pytest.param({"a": 1, "b": int}, NestedField, id="double-nested"),
+    #
+    # TODO Annotated
+    # TODO type generators
+    # TODO Optional
+    # TODO Union
 ]
 
 

@@ -11,7 +11,7 @@ from pydantic_marshals.base.type_aliases import FieldType, TypeHint
 from pydantic_marshals.contains.fields.constants import ConstantField
 from pydantic_marshals.contains.fields.lists import strict_list_field_factory
 from pydantic_marshals.contains.fields.nested import nested_field_factory
-from pydantic_marshals.contains.fields.typed import TypedField
+from pydantic_marshals.contains.fields.typed import GeneratedTypeField, TypedField
 from pydantic_marshals.contains.fields.wildcards import (
     AnythingField,
     NothingField,
@@ -27,6 +27,7 @@ class AssertContainsModel(FieldConverter):
         AnythingField,
         ConstantField,
         TypedField,
+        GeneratedTypeField,
     )
 
     @classmethod

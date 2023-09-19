@@ -17,8 +17,8 @@ class UnorderedLiteralCollection(BaseTypeGenerator):
         :param check_repeats: (default True) determines if repeating values are allowed
         """
         self.items = items
-        self.allow_extra = check_extra
-        self.allow_repeats = check_repeats
+        self.check_extra = check_extra
+        self.check_repeats = check_repeats
 
     def _validate(self, data: list[LiteralType]) -> None:
         data_set: set[LiteralType] = set(data)
@@ -27,12 +27,12 @@ class UnorderedLiteralCollection(BaseTypeGenerator):
         if missing:
             raise ValueError(f"items missing: {missing}")
 
-        if not self.allow_extra:
+        if self.check_extra:
             extra: set[LiteralType] = data_set - self.items
             if extra:
                 raise ValueError(f"extra items found: {extra}")
 
-        if not self.allow_repeats:
+        if self.check_repeats:
             repeats: set[LiteralType] = set()
             seen: set[LiteralType] = set()
 
