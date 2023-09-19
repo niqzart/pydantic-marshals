@@ -1,16 +1,17 @@
 [tool.poetry]
 name = "pydantic-marshals"
-version = "0.2.0"
+version = "0.2.1"
 description = "Library for creating partial pydantic models (automatic converters) from different mappings"
 authors = ["niqzart <niqzart@gmail.com>"]
 readme = "README.md"
 exclude = [
     "examples",
     "tests",
+    "docs",
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 pydantic = ">=2.0,<3.0"
 
 [tool.poetry.group.dev.dependencies]

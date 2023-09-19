@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Self
 
 from pydantic import BaseModel
+from typing_extensions import Self
 
 from pydantic_marshals.base.fields.properties import PropertyField, PropertyType
 from pydantic_marshals.base.models import MarshalModel

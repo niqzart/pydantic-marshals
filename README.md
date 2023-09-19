@@ -21,14 +21,14 @@ pip install pydantic-marshals[assert-contains]
 
 ## Local development
 1. Clone the repository
-2. Setup python (the library is made with python 3.11)
-3. Install poetry (should work with v1.5.1)
+2. Setup python (the library is made with python 3.10+)
+3. Install poetry (should work with v1.4.1)
 4. Install dependencies
 5. Install pre-commit hooks
 
 Commands to use:
 ```sh
-pip install poetry==1.5.1
+pip install poetry==1.4.1
 poetry install
 pre-commit install
 ```

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from types import UnionType
-from typing import Annotated, Any, Self, Union, get_origin
+from typing import Annotated, Any, Union, get_origin
+
+from typing_extensions import Self
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.type_aliases import TypeHint

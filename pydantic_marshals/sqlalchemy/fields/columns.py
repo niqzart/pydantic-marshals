@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from enum import Enum
-from typing import Any, Self
+from typing import Any
 from warnings import warn
 
 from pydantic_core import PydanticUndefined, PydanticUndefinedType
 from sqlalchemy.orm import Mapped, MappedColumn
 from sqlalchemy.sql.schema import Column, ScalarElementColumnDefault
 from sqlalchemy.sql.sqltypes import String
+from typing_extensions import Self
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.type_aliases import TypeHint

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Self
+from typing import Any
+
+from typing_extensions import Self
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.type_aliases import TypeHint
@@ -18,9 +20,7 @@ def strict_list_field_factory(
             if isinstance(source, list):
                 return cls(
                     tuple[  # type: ignore[misc]
-                        *(  # noqa: WPS356 (bug in WPS)
-                            convert_type(value) for value in source
-                        )
+                        tuple(convert_type(value) for value in source)
                     ],
                 )
             return None

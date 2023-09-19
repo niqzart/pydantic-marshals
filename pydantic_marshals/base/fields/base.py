@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any, Self
+from typing import Any
 
 from pydantic import BaseModel, RootModel
 from pydantic.fields import Field
+from typing_extensions import Self
 
 from pydantic_marshals.base.type_aliases import FieldType, TypeHint
 

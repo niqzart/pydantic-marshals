@@ -1,5 +1,7 @@
 from collections.abc import Callable
-from typing import Any, Self, get_type_hints
+from typing import Any, get_type_hints
+
+from typing_extensions import Self
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.type_aliases import TypeHint
