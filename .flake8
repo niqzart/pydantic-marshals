@@ -16,6 +16,7 @@ max-line-length = 88
 extend-ignore =
   # not required or shadowed by other plugins
   D I FI TC Q U101 S101 WPS400
+  PT011  # too broad exception in `pytest.raises` (ValueErrors are needed ib pydantic)
 
   # black
   WPS348 WPS464 E302 C815
@@ -28,6 +29,7 @@ extend-ignore =
   WPS110 VNE002  # screams at variables in overriden methods
   WPS115  # enums use upper-case constants in classes
   WPS465  # fails for pipe-union types (bitwise |)
+  P103  # unreadable (what?)
 
   # too many
   WPS201 WPS210 WPS211 WPS214 WPS218 WPS212 WPS221 WPS227 WPS231 WPS232 WPS235
@@ -51,5 +53,5 @@ extend-ignore =
 
 per-file-ignores =
   __init__.py: F401
-  *test*: SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS441 WPS442 WPS520
-  test_fields.py: NU001 NU002 SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS441 WPS442 WPS520
+  *test*:         SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS437 WPS441 WPS442 WPS520
+  test_fields.py: SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS437 WPS441 WPS442 WPS520 NU001 NU002

@@ -1,9 +1,11 @@
+from collections.abc import Iterable
+
 from pydantic_marshals.contains.type_aliases import LiteralType
 from pydantic_marshals.contains.type_generators.base import BaseTypeGenerator
 
 
 class UnorderedLiteralCollection(BaseTypeGenerator):
-    data_type = list[LiteralType]
+    data_type = Iterable[LiteralType]
 
     def __init__(
         self,
@@ -20,7 +22,7 @@ class UnorderedLiteralCollection(BaseTypeGenerator):
         self.check_extra = check_extra
         self.check_repeats = check_repeats
 
-    def _validate(self, data: list[LiteralType]) -> None:
+    def _validate(self, data: Iterable[LiteralType]) -> None:
         data_set: set[LiteralType] = set(data)
 
         missing: set[LiteralType] = self.items - data_set

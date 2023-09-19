@@ -11,8 +11,12 @@ from pydantic_marshals.base.type_aliases import TypeHint
 from pydantic_marshals.contains.fields import constants, typed, wildcards
 from pydantic_marshals.contains.models import AssertContainsModel
 from pydantic_marshals.contains.type_aliases import LiteralType
+from pydantic_marshals.contains.type_generators.base import BaseTypeGenerator
+from pydantic_marshals.contains.type_generators.collections import (
+    UnorderedLiteralCollection,
+)
 from pydantic_marshals.utils import is_subtype
-from tests.unit.conftest import SampleEnum
+from tests.unit.conftest import DummyFactory, SampleEnum
 
 
 @pytest.fixture()
@@ -76,6 +80,12 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param(Annotated[bytes, 3], typed.TypedField, id="annotated_bytes_typed"),
     pytest.param(Annotated[str, 3], typed.TypedField, id="annotated_str_typed"),
     pytest.param(Annotated[SampleEnum, 3], typed.TypedField, id="annotated_enum_typed"),
+    #
+    pytest.param(
+        UnorderedLiteralCollection(set()),
+        typed.GeneratedTypeField,
+        id="literal_collection_generator",
+    ),
     #
     pytest.param([], StrictListField, id="empty_list"),
     pytest.param([1], StrictListField, id="single_list"),
@@ -167,6 +177,17 @@ def test_typed_generation(source: TypeHint, kind: str) -> None:
 
     assert isinstance(field, typed.TypedField)
     assert field.generate_type() is source
+    assert dict(field.generate_field_data()) == {}
+
+
+def test_generated_types(dummy_factory: DummyFactory) -> None:
+    generator_mock = Mock(BaseTypeGenerator)
+    generator_mock.to_typehint = Mock(return_value=dummy_factory("return"))
+
+    field = typed.GeneratedTypeField.convert(generator_mock)
+
+    assert isinstance(field, typed.GeneratedTypeField)
+    assert field.generate_type() is dummy_factory("return")
     assert dict(field.generate_field_data()) == {}
 
 
