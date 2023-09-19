@@ -30,7 +30,7 @@ extend-ignore =
   WPS465  # fails for pipe-union types (bitwise |)
 
   # too many
-  WPS201 WPS210 WPS211 WPS214 WPS218 WPS212 WPS221 WPS227 WPS235
+  WPS201 WPS210 WPS211 WPS214 WPS218 WPS212 WPS221 WPS227 WPS231 WPS232 WPS235
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
