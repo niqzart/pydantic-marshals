@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from typing import Any, Literal
+from typing import Annotated, Any, Literal, Optional, Union
 from unittest.mock import Mock, patch
 
 import pytest
@@ -31,36 +31,59 @@ NestedField = AssertContainsModel.field_types[6]  # type: ignore[misc]
 StrictListField = AssertContainsModel.field_types[7]  # type: ignore[misc]
 
 SOURCE_TO_KLASS: list[Any] = [
-    pytest.param(None, wildcards.NothingField, id="none-nothing"),
-    pytest.param(..., wildcards.SomethingField, id="...-something"),
-    pytest.param(Any, wildcards.AnythingField, id="any-anything"),
+    pytest.param(None, wildcards.NothingField, id="none_nothing"),
+    pytest.param(..., wildcards.SomethingField, id="..._something"),
+    pytest.param(Any, wildcards.AnythingField, id="any_anything"),
     #
-    pytest.param(True, constants.ConstantField, id="bool-constant"),
-    pytest.param(1, constants.ConstantField, id="int-constant"),
-    pytest.param(1.1, constants.ConstantField, id="float-constant"),
-    pytest.param(b"test", constants.ConstantField, id="bytes-constant"),
-    pytest.param("test", constants.ConstantField, id="str-constant"),
-    pytest.param(SampleEnum.A, constants.ConstantField, id="enum-constant"),
+    pytest.param(True, constants.ConstantField, id="bool_constant"),
+    pytest.param(1, constants.ConstantField, id="int_constant"),
+    pytest.param(1.1, constants.ConstantField, id="float_constant"),
+    pytest.param(b"test", constants.ConstantField, id="bytes_constant"),
+    pytest.param("test", constants.ConstantField, id="str_constant"),
+    pytest.param(SampleEnum.A, constants.ConstantField, id="enum_constant"),
     #
-    pytest.param(bool, typed.TypedField, id="bool-typed"),
-    pytest.param(int, typed.TypedField, id="int-typed"),
-    pytest.param(float, typed.TypedField, id="float-typed"),
-    pytest.param(bytes, typed.TypedField, id="bytes-typed"),
-    pytest.param(str, typed.TypedField, id="str-typed"),
-    pytest.param(SampleEnum, typed.TypedField, id="enum-typed"),
+    pytest.param(bool, typed.TypedField, id="bool_typed"),
+    pytest.param(int, typed.TypedField, id="int_typed"),
+    pytest.param(float, typed.TypedField, id="float_typed"),
+    pytest.param(bytes, typed.TypedField, id="bytes_typed"),
+    pytest.param(str, typed.TypedField, id="str_typed"),
+    pytest.param(SampleEnum, typed.TypedField, id="enum_typed"),
     #
-    pytest.param([], StrictListField, id="empty-list"),
-    pytest.param([1], StrictListField, id="single-list"),
-    pytest.param([1, int], StrictListField, id="double-list"),
+    pytest.param(Optional[bool], typed.TypedField, id="optional_bool_typed"),
+    pytest.param(Optional[int], typed.TypedField, id="optional_int_typed"),
+    pytest.param(Optional[float], typed.TypedField, id="optional_float_typed"),
+    pytest.param(Optional[bytes], typed.TypedField, id="optional_bytes_typed"),
+    pytest.param(Optional[str], typed.TypedField, id="optional_str_typed"),
+    pytest.param(Optional[SampleEnum], typed.TypedField, id="optional_enum_typed"),
     #
-    pytest.param({}, NestedField, id="empty-nested"),
-    pytest.param({"a": 1}, NestedField, id="single-nested"),
-    pytest.param({"a": 1, "b": int}, NestedField, id="double-nested"),
+    pytest.param(Union[bool], typed.TypedField, id="typing_union_bool_typed"),
+    pytest.param(Union[int], typed.TypedField, id="typing_union_int_typed"),
+    pytest.param(Union[float], typed.TypedField, id="typing_union_float_typed"),
+    pytest.param(Union[bytes], typed.TypedField, id="typing_union_bytes_typed"),
+    pytest.param(Union[str], typed.TypedField, id="typing_union_str_typed"),
+    pytest.param(Union[SampleEnum], typed.TypedField, id="typing_union_enum_typed"),
     #
-    # TODO Annotated
-    # TODO type generators
-    # TODO Optional
-    # TODO Union
+    pytest.param(bool | None, typed.TypedField, id="pipe_union_bool_typed"),
+    pytest.param(int | None, typed.TypedField, id="pipe_union_int_typed"),
+    pytest.param(float | None, typed.TypedField, id="pipe_union_float_typed"),
+    pytest.param(bytes | None, typed.TypedField, id="pipe_union_bytes_typed"),
+    pytest.param(str | None, typed.TypedField, id="pipe_union_str_typed"),
+    pytest.param(SampleEnum | None, typed.TypedField, id="pipe_union_enum_typed"),
+    #
+    pytest.param(Annotated[bool, 3], typed.TypedField, id="annotated_bool_typed"),
+    pytest.param(Annotated[int, 3], typed.TypedField, id="annotated_int_typed"),
+    pytest.param(Annotated[float, 3], typed.TypedField, id="annotated_float_typed"),
+    pytest.param(Annotated[bytes, 3], typed.TypedField, id="annotated_bytes_typed"),
+    pytest.param(Annotated[str, 3], typed.TypedField, id="annotated_str_typed"),
+    pytest.param(Annotated[SampleEnum, 3], typed.TypedField, id="annotated_enum_typed"),
+    #
+    pytest.param([], StrictListField, id="empty_list"),
+    pytest.param([1], StrictListField, id="single_list"),
+    pytest.param([1, int], StrictListField, id="double_list"),
+    #
+    pytest.param({}, NestedField, id="empty_nested"),
+    pytest.param({"a": 1}, NestedField, id="single_nested"),
+    pytest.param({"a": 1, "b": int}, NestedField, id="double_nested"),
 ]
 
 
@@ -78,9 +101,9 @@ def test_klass_skips(source: Any, exclude_klass: type[MarshalField]) -> None:
 @pytest.mark.parametrize(
     ("source", "klass", "type_", "has_default"),
     [
-        pytest.param(None, wildcards.NothingField, type(None), True, id="none-nothing"),
-        pytest.param(..., wildcards.SomethingField, Any, False, id="...-something"),
-        pytest.param(Any, wildcards.AnythingField, Any, True, id="any-anything"),
+        pytest.param(None, wildcards.NothingField, type(None), True, id="none_nothing"),
+        pytest.param(..., wildcards.SomethingField, Any, False, id="..._something"),
+        pytest.param(Any, wildcards.AnythingField, Any, True, id="any_anything"),
     ],
 )
 def test_wildcard_generation(
@@ -131,7 +154,15 @@ def test_constant_generation(source: LiteralType) -> None:
         pytest.param(SampleEnum, id="enum"),
     ],
 )
-def test_typed_generation(source: type) -> None:
+@pytest.mark.parametrize("kind", ["normal", "optional", "typing_union", "pipe_union"])
+def test_typed_generation(source: TypeHint, kind: str) -> None:
+    if kind == "optional":
+        source = Optional[source]
+    elif kind == "typing_union":
+        source = Union[source]
+    elif kind == "pipe_union":
+        source = source | None
+
     field = typed.TypedField.convert(source)
 
     assert isinstance(field, typed.TypedField)

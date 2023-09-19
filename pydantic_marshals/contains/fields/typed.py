@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Annotated, Any, Optional, Self, get_origin
+from types import UnionType
+from typing import Annotated, Any, Self, Union, get_origin
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.type_aliases import TypeHint
@@ -17,7 +18,7 @@ class TypedField(MarshalField):
         if (
             source is not Any
             and isinstance(source, type)
-            or get_origin(source) in {Annotated, Optional}
+            or get_origin(source) in {Annotated, Union, UnionType}
         ):
             return cls(source)
         return None
