@@ -100,9 +100,10 @@ def test_wildcards():
 ```
 
 ### Checking Lists
-Depending on the circumstances, two ways of validating lists could be used:
+Depending on the circumstances, three ways of validating lists could be used:
 - Validating all items with one schema: can be done via [`conlist`](https://docs.pydantic.dev/usage/types/#arguments-to-conlist)
 - Validating each individual item, via applying `assert_contains` for each of them
+- Validating list as an unordered collection of literal values, see [`UnorderedLiteralCollection`](#unorderedliteralcollection)
 
 ```py
 from pydantic import conlist
@@ -136,5 +137,47 @@ def test_pydantic():
     assert_contains(
         model_the_model(),
         SomeModel,
+    )
+```
+
+### Custom Types
+Pydantic allows [custom data types](https://docs.pydantic.dev/2.0/usage/types/custom) via `Annotated`. These are also supported in assert-contains, including pydantic-agnostic variants from [`annotated-types`](https://github.com/annotated-types/annotated-types) and complex checks via [`AfterValidator`](https://docs.pydantic.dev/2.0/usage/types/custom/#adding-validation-and-serialization).
+In addition to that, assert-contains offers a few useful [custom-type generators](#type-generators)
+
+```py
+from typing import Annotated
+from annotated_types import Gt
+from pydantic import AfterValidator, Field
+from pydantic_marshals.contains import assert_contains
+
+
+def validate_divisible_by_three(value: int) -> int:
+    if value % 3 != 0:
+        raise ValueError("value not divisible by three")
+    return value  # return is not required, but is "more correct"
+
+
+def test_custom():
+    assert_contains(
+        complex_stuff(),
+        {
+            "t_celsius": Annotated[float, Field(gt=-273.15)],
+            "t_fahrenheit": Annotated[float, Gt(-459.67)],
+            "times_three": Annotated[int, AfterValidator(validate_divisible_by_three)]
+        },
+    )
+```
+
+## Utils
+### Type Generators
+#### UnorderedLiteralCollection
+```py
+from pydantic_marshals.contains import assert_contains, UnorderedLiteralCollection
+
+
+def test_flags():
+    assert_contains(
+        collect_flags(),
+        UnorderedLiteralCollection({"editable", "deletable"}, check_extra=False),
     )
 ```
