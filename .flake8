@@ -15,27 +15,33 @@ max-line-length = 88
 # ignores
 extend-ignore =
   # not required or shadowed by other plugins
-  D I FI TC Q U101 S101 WPS400
+  D I FI TC Q U101 S101 WPS361 WPS400
+  PT011  # too broad exception in `pytest.raises` (ValueErrors are needed ib pydantic)
 
   # black
-  WPS348 E302
+  WPS348 WPS464 E302 C815
   # weird
-  PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111
+  PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111 WPS338
   # broken
   PIE798 WPS226 WPS354 RST304
   WPS322 WPS428 WPS462  # fails for class-attribute docstrings
   U100  # fails to understand `raise NotImplementedError`
   WPS110 VNE002  # screams at variables in overriden methods
+  WPS115  # enums use upper-case constants in classes
+  WPS465  # fails for pipe-union types (bitwise |)
+  P103  # unreadable (what?)
 
   # too many
-  WPS211 WPS214
+  WPS201 WPS210 WPS211 WPS214 WPS218 WPS212 WPS221 WPS227 WPS231 WPS232 WPS235
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
   WPS305  # f-strings are the best
   WPS306  # python 2.x is deprecated
   WPS420  # pass is a thing
+  WPS412  # __init__ for libs is required
   WPS430  # nested functions
+  WPS431  # nested classes
   WPS501  # try-finally with no except
   WPS600  # subclassing lowercase builtins
   WPS602  # @staticmethod
@@ -44,3 +50,8 @@ extend-ignore =
 
   # preferences
   WPS337  # multiline conditions
+
+per-file-ignores =
+  __init__.py: F401
+  *test*:         SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS437 WPS441 WPS442 WPS520
+  test_fields.py: SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS437 WPS441 WPS442 WPS520 NU001 NU002

@@ -5,13 +5,13 @@ from typing import Self
 
 from pydantic import BaseModel
 
-from pydantic_marshals.fields.properties import PropertyField, PropertyType
-from pydantic_marshals.fields.sqlalchemy.columns import ColumnField, ColumnType
-from pydantic_marshals.fields.sqlalchemy.relationships import (
+from pydantic_marshals.base.fields.properties import PropertyField, PropertyType
+from pydantic_marshals.base.models import MarshalModel
+from pydantic_marshals.sqlalchemy.fields.columns import ColumnField, ColumnType
+from pydantic_marshals.sqlalchemy.fields.relationships import (
     RelationshipField,
     RelationshipType,
 )
-from pydantic_marshals.models.base import MarshalModel
 
 
 class MappedModel(MarshalModel):

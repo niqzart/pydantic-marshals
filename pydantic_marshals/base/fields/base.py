@@ -3,7 +3,10 @@ from __future__ import annotations
 from collections.abc import Iterator
 from typing import Any, Self
 
-from pydantic.fields import Field, FieldInfo
+from pydantic import BaseModel, RootModel
+from pydantic.fields import Field
+
+from pydantic_marshals.base.type_aliases import FieldType, TypeHint
 
 
 class MarshalField:
@@ -34,7 +37,7 @@ class MarshalField:
         """
         raise NotImplementedError
 
-    def generate_type(self) -> type:
+    def generate_type(self) -> TypeHint:
         """
         Generates the type annotation for the field, used in
         :py:meth:`pydantic_marshals.models.base.MarshalModel.generate_model`
@@ -51,9 +54,10 @@ class MarshalField:
         Kwarg names and types can be found in
         :py:class:`pydantic.fields._FieldInfoInputs`
         """
-        yield "alias", self.alias
+        if self.alias is not None:
+            yield "alias", self.alias
 
-    def generate_field(self) -> tuple[type, FieldInfo]:
+    def generate_field(self) -> FieldType:
         """
         Generates field info for the field, used in
         :py:meth:`pydantic_marshals.models.base.MarshalModel.generate_model`
@@ -62,3 +66,6 @@ class MarshalField:
             self.generate_type(),
             Field(**dict(self.generate_field_data())),
         )
+
+    def generate_root_model(self) -> type[BaseModel]:
+        return RootModel[self.generate_type()]  # type: ignore[no-any-return, misc]
