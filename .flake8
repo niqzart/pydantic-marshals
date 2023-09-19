@@ -15,7 +15,7 @@ max-line-length = 88
 # ignores
 extend-ignore =
   # not required or shadowed by other plugins
-  D I FI TC Q U101 S101 WPS400
+  D I FI TC Q U101 S101 WPS361 WPS400
   PT011  # too broad exception in `pytest.raises` (ValueErrors are needed ib pydantic)
 
   # black
