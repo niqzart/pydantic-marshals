@@ -46,6 +46,12 @@ def test_authorization():
     )
 ```
 
+The simplest example of this is that you actually could use `assert_contains` instead of an equality check:
+```py
+assert_contains(3, 3)  # no errors raised
+assert_contains(5, 3)  # ValidationError: Input should be 3 [type=literal_error, input_value=5, input_type=int]
+```
+
 ### Only checking the type
 Sometimes you do not know the exact value of a field, but you might need to check its type and some type-based constraints (like string length). For this you can use:
 
@@ -73,6 +79,12 @@ def test_page_data():
             "published": StrictBool,
         }
     )
+```
+
+The simplest example of this is that you actually could use `assert_contains` instead of an `isinstance` check:
+```py
+assert_contains(3, int)  # no errors raised
+assert_contains(3, str)  # ValidationError: Input should be a valid string [type=string_type, input_value=3, input_type=int]
 ```
 
 ### Everything or nothing
