@@ -21,7 +21,7 @@ def sample_field() -> typed.TypedField:
 
 
 @pytest.fixture()
-def convert_field_mock(sample_field: typed.TypedField) -> Iterator[Mock]:
+def convert_field_mock_to_sample(sample_field: typed.TypedField) -> Iterator[Mock]:
     with patch.object(AssertContainsModel, "convert_field") as mock:
         mock.return_value = sample_field
         yield mock
@@ -59,7 +59,7 @@ SOURCE_TO_KLASS: list[Any] = [
 ]
 
 
-@pytest.mark.usefixtures(convert_field_mock.__name__)
+@pytest.mark.usefixtures(convert_field_mock_to_sample.__name__)
 @pytest.mark.parametrize(("source", "exclude_klass"), SOURCE_TO_KLASS)
 def test_klass_skips(source: Any, exclude_klass: type[MarshalField]) -> None:
     klass: type[MarshalField]
@@ -69,7 +69,7 @@ def test_klass_skips(source: Any, exclude_klass: type[MarshalField]) -> None:
         assert klass.convert(source) is None
 
 
-@pytest.mark.usefixtures(convert_field_mock.__name__)
+@pytest.mark.usefixtures(convert_field_mock_to_sample.__name__)
 @pytest.mark.parametrize(
     ("source", "klass", "type_", "has_default"),
     [
@@ -134,7 +134,7 @@ def test_typed_generation(source: type) -> None:
     assert dict(field.generate_field_data()) == {}
 
 
-@pytest.mark.usefixtures(convert_field_mock.__name__)
+@pytest.mark.usefixtures(convert_field_mock_to_sample.__name__)
 @pytest.mark.parametrize(
     "length",
     [
@@ -159,7 +159,7 @@ def test_strict_list_generation(
     assert dict(field.generate_field_data()) == {}
 
 
-@pytest.mark.usefixtures(convert_field_mock.__name__)
+@pytest.mark.usefixtures(convert_field_mock_to_sample.__name__)
 @pytest.mark.parametrize(
     ("source", "fields"),
     [
