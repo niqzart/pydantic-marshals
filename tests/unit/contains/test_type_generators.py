@@ -1,6 +1,6 @@
 from contextlib import nullcontext
 from typing import Annotated, get_args, get_origin
-from unittest.mock import PropertyMock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from pydantic import AfterValidator
@@ -13,8 +13,7 @@ from tests.unit.conftest import DummyFactory
 
 
 def test_typehint_generation(dummy_factory: DummyFactory) -> None:
-    generator = BaseTypeGenerator()
-    generator.data_type = PropertyMock(return_value=dummy_factory("data_type"))
+    generator = BaseTypeGenerator(data_type=Mock())
     generator.validate = dummy_factory("validate")  # type: ignore[method-assign]
 
     type_hint = generator.to_typehint()
@@ -27,7 +26,7 @@ def test_typehint_generation(dummy_factory: DummyFactory) -> None:
 
 
 def test_validation(dummy_factory: DummyFactory) -> None:
-    generator = BaseTypeGenerator()
+    generator = BaseTypeGenerator(data_type=dummy_factory("data_type"))
 
     with patch.object(generator, "_validate") as validate_mock:
         assert generator.validate(dummy_factory("data")) is dummy_factory("data")
@@ -104,9 +103,9 @@ def test_unordered_literal_collection(
     data = supplied_items + repeated_items + extra_items
 
     collection = UnorderedLiteralCollection(
-        set(required_items),
-        check_extra,
-        check_repeats,
+        items=required_items,
+        check_extra=check_extra,
+        check_repeats=check_repeats,
     )
     with pytest.raises(ValueError) if error else nullcontext() as exc:
         collection._validate(data)

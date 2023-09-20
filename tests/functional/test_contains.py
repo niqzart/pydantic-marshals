@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Callable
 from enum import Enum
 from typing import Annotated, Any, Optional, Union
@@ -22,6 +24,14 @@ class LiteralValue(Enum):
     BYTES = b"test"
     STR = "test"
     ENUM = SampleEnum.A
+
+    @classmethod
+    def number_values(cls) -> set[LiteralValue]:
+        return {cls.TRUE, cls.FALSE, cls.INT, cls.FLOAT}
+
+    @classmethod
+    def string_values(cls) -> set[LiteralValue]:
+        return {cls.STR, cls.BYTES}
 
     @property
     def slug(self) -> str:
@@ -127,3 +137,74 @@ def test_complex_fail() -> None:
         ("l",): {"type": "value_error", "msg": "Value error, items missing: {'hey'}"},
         ("r",): {"type": "value_error", "msg": "Value error, extra items found: {2}"},
     }
+
+
+@pytest.mark.parametrize(
+    ("data_type", "skip_values", "error_type", "error_msg"),
+    [
+        pytest.param(
+            bool,
+            LiteralValue.number_values(),
+            "bool_parsing",
+            "boolean",
+            id="type_bool",
+        ),
+        pytest.param(
+            int,
+            LiteralValue.number_values(),
+            "int_parsing",
+            "integer",
+            id="type_int",
+        ),
+        pytest.param(
+            float,
+            LiteralValue.number_values(),
+            "float_parsing",
+            "number",
+            id="type_float",
+        ),
+        pytest.param(
+            bytes,
+            LiteralValue.string_values(),
+            "bytes_type",
+            "bytes",
+            id="type_bytes",
+        ),
+        pytest.param(
+            str,
+            LiteralValue.string_values(),
+            "string_type",
+            "string",
+            id="type_str",
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param(literal, id=f"literal_{literal.slug}")
+        for literal in LiteralValue
+        if literal not in {LiteralValue.NONE, LiteralValue.ENUM}
+    ],
+)
+def test_unordered_literal_collection_types(
+    data_type: type[LiteralType],
+    skip_values: set[LiteralValue],
+    error_type: str,
+    error_msg: str,
+    value: LiteralValue,
+) -> None:
+    if value in skip_values:
+        return
+
+    collection = UnorderedLiteralCollection([value.value], data_type=data_type)
+
+    with pytest.raises(ValidationError) as exc:
+        AssertContainsModel.contains([value.value], collection)
+
+    assert exc.type is ValidationError
+    errors = exc.value.errors()
+    assert len(errors) == 1
+    assert errors[0].get("type") == error_type
+    assert errors[0].get("msg") is not None
+    assert errors[0]["msg"].startswith(f"Input should be a valid {error_msg}")

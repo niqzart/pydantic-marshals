@@ -1,15 +1,15 @@
 from collections.abc import Iterable
 
+from pydantic_marshals.base.type_aliases import TypeHint
 from pydantic_marshals.contains.type_aliases import LiteralType
 from pydantic_marshals.contains.type_generators.base import BaseTypeGenerator
 
 
 class UnorderedLiteralCollection(BaseTypeGenerator):
-    data_type = Iterable[LiteralType]
-
     def __init__(
         self,
-        items: set[LiteralType],
+        items: Iterable[LiteralType],
+        data_type: TypeHint = LiteralType,
         check_extra: bool = True,
         check_repeats: bool = True,
     ) -> None:
@@ -18,7 +18,8 @@ class UnorderedLiteralCollection(BaseTypeGenerator):
         :param check_extra: (default True) determines if extra values are allowed
         :param check_repeats: (default True) determines if repeating values are allowed
         """
-        self.items = items
+        super().__init__(Iterable[data_type])
+        self.items: set[LiteralType] = set(items)
         self.check_extra = check_extra
         self.check_repeats = check_repeats
 

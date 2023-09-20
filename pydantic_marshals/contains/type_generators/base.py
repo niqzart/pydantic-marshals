@@ -13,7 +13,8 @@ class BaseTypeGenerator:
     See also: https://docs.pydantic.dev/2.0/usage/types/custom
     """
 
-    data_type: TypeHint
+    def __init__(self, data_type: TypeHint) -> None:
+        self.data_type = data_type
 
     def _validate(self, data: Any) -> None:
         """
