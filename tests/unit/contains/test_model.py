@@ -1,13 +1,13 @@
 from collections.abc import Iterator
 from typing import Any
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 from pydantic import RootModel
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.contains.models import AssertContainsModel
-from tests.unit.conftest import DummyException, DummyFactory
+from tests.unit.conftest import DummyException, DummyFactory, MockStack
 from tests.unit.contains.test_fields import SOURCE_TO_KLASS
 
 
@@ -29,10 +29,10 @@ def field_mock() -> Mock:
 
 
 @pytest.fixture()
-def convert_field_mock_to_mock(field_mock: Mock) -> Iterator[Mock]:
-    with patch.object(AssertContainsModel, "convert_field") as mock:
-        mock.return_value = field_mock
-        yield mock
+def convert_field_mock_to_mock(field_mock: Mock, mock_stack: MockStack) -> Mock:
+    return mock_stack.enter_mock(
+        AssertContainsModel, "convert_field", return_value=field_mock
+    )
 
 
 @pytest.mark.parametrize("method", ["type", "field"])

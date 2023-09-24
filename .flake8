@@ -19,7 +19,7 @@ extend-ignore =
   PT011  # too broad exception in `pytest.raises` (ValueErrors are needed ib pydantic)
 
   # black
-  WPS348 WPS464 E302 C815
+  WPS348 WPS464 E302 C812 C815
   # weird
   PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111 WPS338
   # broken
@@ -42,6 +42,7 @@ extend-ignore =
   WPS412  # __init__ for libs is required
   WPS430  # nested functions
   WPS431  # nested classes
+  WPS451  # positional-only arguments
   WPS501  # try-finally with no except
   WPS600  # subclassing lowercase builtins
   WPS602  # @staticmethod
