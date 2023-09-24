@@ -6,7 +6,6 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-DummyObject = Any
 DummyException = BaseException
 
 
@@ -14,8 +13,19 @@ class SampleEnum(Enum):
     A = 1
 
 
+class DummyObject:
+    def __init__(self, item: Any) -> None:
+        self.item = item
+
+    def __repr__(self) -> str:
+        return f"DummyObject from {self.item!r}"
+
+    def __str__(self) -> str:
+        return repr(self)
+
+
 class DummyFactory(Protocol):
-    def __call__(self, item: Any) -> DummyObject:
+    def __call__(self, item: Any) -> Any:
         pass
 
 
@@ -23,8 +33,8 @@ class DummyFactory(Protocol):
 def dummy_factory() -> DummyFactory:  # TODO sentinel
     dummies: dict[Any, DummyObject] = {}
 
-    def dummy_factory_inner(item: Any) -> DummyObject:
-        return dummies.setdefault(item, object())
+    def dummy_factory_inner(item: Any) -> Any:
+        return dummies.setdefault(item, DummyObject(item))
 
     return dummy_factory_inner
 
