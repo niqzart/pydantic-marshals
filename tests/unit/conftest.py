@@ -12,6 +12,7 @@ DummyException = BaseException
 
 class SampleEnum(Enum):
     A = 1
+    B = 2
 
 
 class DummyObject:
