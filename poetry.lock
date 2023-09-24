@@ -824,7 +824,7 @@ gitdb = ">=4.0.1,<5"
 name = "greenlet"
 version = "2.0.2"
 description = "Lightweight in-process concurrent programming"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 files = [
@@ -1506,7 +1506,7 @@ files = [
 name = "sqlalchemy"
 version = "2.0.19"
 description = "Database Abstraction Library"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1674,7 +1674,11 @@ pep8-naming = ">=0.13,<0.14"
 pygments = ">=2.4,<3.0"
 typing_extensions = ">=4.0,<5.0"
 
+[extras]
+assert-contains = []
+sqlalchemy = ["sqlalchemy"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a0d2067e47e8737b6ef33630a262f601326e8b1829e1711e196a2b34b9e842cd"
+content-hash = "c28e784b271d12cab57bf405d8de7c691e9d80c9fe6a38758a427b51b6923c17"

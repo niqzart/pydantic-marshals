@@ -2,15 +2,17 @@ from collections.abc import Iterator
 from contextlib import ExitStack
 from enum import Enum
 from typing import Any, Protocol, overload
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
+from pydantic_core import PydanticUndefined, PydanticUndefinedType
 
 DummyException = BaseException
 
 
 class SampleEnum(Enum):
     A = 1
+    B = 2
 
 
 class DummyObject:
@@ -59,6 +61,7 @@ class MockStack(ExitStack):
         *,
         mock: Mock | None = None,
         return_value: Any | None = None,
+        property_value: Any | None | PydanticUndefinedType = PydanticUndefined,
     ) -> Mock:
         ...
 
@@ -70,6 +73,7 @@ class MockStack(ExitStack):
         *,
         mock: Mock | None = None,
         return_value: Any | None = None,
+        property_value: Any | None | PydanticUndefinedType = PydanticUndefined,
     ) -> Mock:
         ...
 
@@ -79,9 +83,13 @@ class MockStack(ExitStack):
         attribute: str | None = None,
         mock: Mock | None = None,
         return_value: Any | None = None,
+        property_value: Any | None | PydanticUndefinedType = PydanticUndefined,
     ) -> Mock:
         if mock is None:
-            mock = Mock(return_value=return_value)
+            if property_value is PydanticUndefined:
+                mock = Mock(return_value=return_value)
+            else:
+                mock = PropertyMock(return_value=property_value)
         if attribute is None:
             return self.enter_context(patch(target, mock))
         return self.enter_context(patch.object(target, attribute, mock))

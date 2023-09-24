@@ -66,7 +66,7 @@ def test_fail_conversion(
     field_types = tuple(create_field_convert_mock(None) for _ in range(field_count))
 
     field_types_mock = mock_stack.enter_mock(
-        FieldConverter, "field_types", mock=PropertyMock(return_value=field_types)
+        FieldConverter, "field_types", property_value=field_types
     )
 
     with pytest.raises(RuntimeError) as exc:

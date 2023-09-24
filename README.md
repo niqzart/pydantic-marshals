@@ -8,7 +8,60 @@ TBA
 TBA
 
 ### SQLAlchemy: Basic usage
-TBA
+```py
+# sqlalchemy 2.0+ is required
+from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from pydantic_marshals.sqlalchemy import MappedModel
+
+class Avatar(Base):
+    __tablename__ = "avatars"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    IdModel = MappedModel.create(columns=[id])
+
+class User(Base):
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100))
+    description: Mapped[str | None] = mapped_column(Text())
+
+    avatar_id: Mapped[int] = mapped_column(ForeignKey("avatars.id"))
+    avatar: Mapped[Avatar] = relationship()
+
+    @property
+    def representation(self) -> str:
+        return f"User #{self.id}: {self.name}"
+
+    BaseModel = MappedModel.create(columns=[id])
+    CreateModel = MappedModel.create(columns=[name, description])
+    IndexModel = MappedModel.create(properties=[representation])
+    FullModel = BaseModel.extend(
+        relationships=[(avatar, Avatar.IdModel)],
+        includes=[CreateModel, IndexModel],
+    )
+
+
+with sessionmaker.begin() as session:
+    user = User(name="alex", description="cool person", avatar=Avatar())
+    session.add(user)
+    session.flush()
+
+    print(User.BaseModel.model_validate(user).model_dump())
+    # {"id": 0}
+    print(User.CreateModel.model_validate(user).model_dump())
+    # {"name": "alex", "description": "cool person"}
+    print(User.IndexModel.model_validate(user).model_dump())
+    # {"representation": "User #0: alex"}
+    print(User.FullModel.model_validate(user).model_dump())
+    # {
+    #   "id": 0,
+    #   "name": "alex",
+    #   "description": "cool person",
+    #   "representation": "User #0: alex",
+    #   "avatar": {"id": 0}
+    # }
+```
 
 ### Assert Contains
 The "assert contains" is an interface for validating data, mainly used in testing. Use `"assert-contains"` extra to install this module:
