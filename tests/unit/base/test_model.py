@@ -1,7 +1,7 @@
 # mypy: disable-error-code="method-assign"
 
 from typing import Any
-from unittest.mock import Mock, PropertyMock
+from unittest.mock import Mock
 
 import pytest
 from pydantic import create_model
@@ -77,9 +77,7 @@ def test_descriptor(
     classed_model: Any,
 ) -> None:
     generate_model_mock = mock_stack.enter_mock(
-        simple_model,
-        "generate_model",
-        mock=PropertyMock(return_value=dummy_factory("return")),
+        simple_model, "generate_model", property_value=dummy_factory("return")
     )
 
     assert classed_model.model is dummy_factory("return")
