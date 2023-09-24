@@ -48,7 +48,7 @@ class MappedModel(MarshalModel):
             *cls.convert_fields(*relationships),
             *cls.convert_fields(*properties),
             *(field for model in includes for field in model.fields),
-            bases=list(bases),
+            bases=list(bases) + [base for model in includes for base in model.bases],
         )
 
     def extend(

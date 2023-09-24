@@ -51,6 +51,7 @@ extend-ignore =
 
   # preferences
   WPS337  # multiline conditions
+  WPS352  # multiline loops
 
 per-file-ignores =
   __init__.py: F401
