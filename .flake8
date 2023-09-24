@@ -19,7 +19,7 @@ extend-ignore =
   PT011  # too broad exception in `pytest.raises` (ValueErrors are needed ib pydantic)
 
   # black
-  WPS348 WPS464 E302 C815
+  WPS348 WPS464 E302 C812 C815
   # weird
   PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111 WPS338
   # broken
@@ -32,7 +32,7 @@ extend-ignore =
   P103  # unreadable (what?)
 
   # too many
-  WPS201 WPS210 WPS211 WPS214 WPS218 WPS212 WPS221 WPS227 WPS231 WPS232 WPS235
+  WPS201 WPS204 WPS210 WPS211 WPS214 WPS218 WPS212 WPS221 WPS227 WPS231 WPS232 WPS235
 
   # don't block features
   WPS237  # screams at 'complex' f-strings
@@ -42,6 +42,7 @@ extend-ignore =
   WPS412  # __init__ for libs is required
   WPS430  # nested functions
   WPS431  # nested classes
+  WPS451  # positional-only arguments
   WPS501  # try-finally with no except
   WPS600  # subclassing lowercase builtins
   WPS602  # @staticmethod
@@ -53,5 +54,5 @@ extend-ignore =
 
 per-file-ignores =
   __init__.py: F401
-  *test*:         SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS437 WPS441 WPS442 WPS520
-  test_fields.py: SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS437 WPS441 WPS442 WPS520 NU001 NU002
+  *test*:         SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS440 WPS437 WPS441 WPS442 WPS507 WPS520
+  test_fields.py: SCS108 VNE001 WPS202 WPS317 WPS407 WPS425 WPS432 WPS440 WPS437 WPS441 WPS442 WPS507 WPS520 NU001 NU002

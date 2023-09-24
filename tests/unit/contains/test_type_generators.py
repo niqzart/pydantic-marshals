@@ -1,6 +1,6 @@
 from contextlib import nullcontext
 from typing import Annotated, get_args, get_origin
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 from pydantic import AfterValidator
@@ -9,7 +9,7 @@ from pydantic_marshals.contains.type_generators.base import BaseTypeGenerator
 from pydantic_marshals.contains.type_generators.collections import (
     UnorderedLiteralCollection,
 )
-from tests.unit.conftest import DummyFactory
+from tests.unit.conftest import DummyFactory, MockStack
 
 
 def test_typehint_generation(dummy_factory: DummyFactory) -> None:
@@ -25,12 +25,14 @@ def test_typehint_generation(dummy_factory: DummyFactory) -> None:
     assert type_hint_args[1].func is generator.validate
 
 
-def test_validation(dummy_factory: DummyFactory) -> None:
+def test_validation(dummy_factory: DummyFactory, mock_stack: MockStack) -> None:
     generator = BaseTypeGenerator(data_type=dummy_factory("data_type"))
 
-    with patch.object(generator, "_validate") as validate_mock:
-        assert generator.validate(dummy_factory("data")) is dummy_factory("data")
-        validate_mock.assert_called_once_with(dummy_factory("data"))
+    validate_mock = mock_stack.enter_mock(generator, "_validate")
+
+    assert generator.validate(dummy_factory("data")) is dummy_factory("data")
+
+    validate_mock.assert_called_once_with(dummy_factory("data"))
 
 
 @pytest.mark.parametrize(

@@ -1,6 +1,5 @@
-from collections.abc import Iterator
 from typing import Annotated, Any, Literal, Optional, Union
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 from pydantic import BaseModel
@@ -16,7 +15,7 @@ from pydantic_marshals.contains.type_generators.collections import (
     UnorderedLiteralCollection,
 )
 from pydantic_marshals.utils import is_subtype
-from tests.unit.conftest import DummyFactory, SampleEnum
+from tests.unit.conftest import DummyFactory, MockStack, SampleEnum
 
 
 @pytest.fixture()
@@ -25,10 +24,13 @@ def sample_field() -> typed.TypedField:
 
 
 @pytest.fixture()
-def convert_field_mock_to_sample(sample_field: typed.TypedField) -> Iterator[Mock]:
-    with patch.object(AssertContainsModel, "convert_field") as mock:
-        mock.return_value = sample_field
-        yield mock
+def convert_field_mock_to_sample(
+    sample_field: typed.TypedField,
+    mock_stack: MockStack,
+) -> Mock:
+    return mock_stack.enter_mock(
+        AssertContainsModel, "convert_field", return_value=sample_field
+    )
 
 
 NestedField = AssertContainsModel.field_types[6]  # type: ignore[misc]
