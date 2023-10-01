@@ -22,16 +22,28 @@ class RelationshipField(MarshalField):
         self,
         mapped_relationship: Relationship[Any],
         model: type[BaseModel],
+        nullable: bool = False,
         alias: str | None = None,
     ) -> None:
         super().__init__(alias)
         self.relationship = mapped_relationship
         self.model = model
+        self.nullable = nullable
 
     @classmethod
-    def convert(cls, mapped: Any = None, model: Any = None, *_: Any) -> Self | None:
-        if isinstance(mapped, Relationship) and is_subtype(model, BaseModel):
-            return cls(mapped, model)
+    def convert(
+        cls,
+        mapped: Any = None,
+        model: Any = None,
+        nullable: Any = False,
+        *_: Any,
+    ) -> Self | None:
+        if (
+            isinstance(mapped, Relationship)
+            and is_subtype(model, BaseModel)
+            and isinstance(nullable, bool)
+        ):
+            return cls(mapped, model, nullable)
         return None
 
     def generate_name(self) -> str:
@@ -40,6 +52,8 @@ class RelationshipField(MarshalField):
     def generate_type(self) -> TypeHint:
         collection_class = self.relationship.collection_class
         if collection_class is None:
+            if self.nullable:
+                return self.model | None
             return self.model
         if not isinstance(collection_class, type):
             raise RuntimeError(f"Collection is not a type: {collection_class}")
