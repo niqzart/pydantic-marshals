@@ -6,12 +6,12 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Mapped, Relationship
 from typing_extensions import Self
 
-from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.fields.base import PatchMarshalField
 from pydantic_marshals.base.type_aliases import TypeHint
 from pydantic_marshals.utils import ModeledType, is_subtype
 
 
-class RelationshipField(MarshalField):
+class RelationshipField(PatchMarshalField):
     """
     Implementation of :py:class:`MarshalField` to use with SQLAlchemy's relationships
     A conversion model has to be specified, preferably one made with
@@ -24,11 +24,21 @@ class RelationshipField(MarshalField):
         model: type[BaseModel],
         nullable: bool = False,
         alias: str | None = None,
+        patch: bool = False,
     ) -> None:
-        super().__init__(alias)
+        super().__init__(alias, patch)
         self.relationship = mapped_relationship
         self.model = model
         self.nullable = nullable
+
+    def as_patch(self) -> RelationshipField:
+        return RelationshipField(
+            mapped_relationship=self.relationship,
+            model=self.model,
+            nullable=self.nullable,
+            alias=self.alias,
+            patch=True,
+        )
 
     @classmethod
     def convert(

@@ -5,6 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel, RootModel
 from pydantic.fields import Field
+from pydantic_core import PydanticUndefined, PydanticUndefinedType
 from typing_extensions import Self
 
 from pydantic_marshals.base.type_aliases import FieldType, TypeHint
@@ -70,3 +71,34 @@ class MarshalField:
 
     def generate_root_model(self) -> type[BaseModel]:
         return RootModel[self.generate_type()]  # type: ignore[no-any-return, misc]
+
+
+PatchDefault = object()
+
+
+class PatchMarshalField(MarshalField):
+    def __init__(self, alias: str | None = None, patch: bool = False) -> None:
+        """
+        :param alias: same as Field(alias=...), can be None for no alias
+        :param patch: use PatchDefault as a default for the filed
+        """
+        super().__init__(alias=alias)
+        self.patch = patch
+
+    def as_patch(self) -> Self:
+        """
+        Creates the same field (copy), but with patch=True
+        """
+        raise NotImplementedError
+
+    def generate_default(self) -> Any | None | PydanticUndefinedType:
+        """
+        Generates the default for the field, used in
+        :py:meth:`pydantic_marshals.models.base.MarshalModel.generate_field_data`
+        """
+        return PydanticUndefined
+
+    def generate_field_data(self) -> Iterator[tuple[str, Any]]:
+        yield "default", PatchDefault if self.patch else self.generate_default()
+
+        yield from super().generate_field_data()

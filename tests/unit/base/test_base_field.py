@@ -1,7 +1,12 @@
 import pytest
 from pydantic import RootModel
+from pydantic_core import PydanticUndefined
 
-from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.fields.base import (
+    MarshalField,
+    PatchDefault,
+    PatchMarshalField,
+)
 from tests.unit.conftest import DummyFactory, MockStack
 
 
@@ -13,6 +18,9 @@ def test_generate_aliased_field(
     if alias is not None:
         expected["alias"] = alias
 
+    field = MarshalField(alias=alias)
+    assert dict(field.generate_field_data()) == expected
+
     generate_type_mock = mock_stack.enter_mock(
         MarshalField, "generate_type", return_value=dummy_factory("type")
     )
@@ -20,15 +28,21 @@ def test_generate_aliased_field(
         "pydantic_marshals.base.fields.base.Field", return_value=dummy_factory("field")
     )
 
-    field = MarshalField(alias=alias)
-    assert dict(field.generate_field_data()) == expected
-
     annotation, field_info = field.generate_field()
     assert annotation is dummy_factory("type")
     assert field_info is dummy_factory("field")
 
     generate_type_mock.assert_called_once_with()
     pydantic_field_mock.assert_called_once_with(**expected)
+
+
+@pytest.mark.parametrize("patch", [False, True])
+def test_generate_patch_field(
+    patch: bool, dummy_factory: DummyFactory, mock_stack: MockStack
+) -> None:
+    expected = {"default": PatchDefault if patch else PydanticUndefined}
+    field = PatchMarshalField(patch=patch)
+    assert dict(field.generate_field_data()) == expected
 
 
 def test_generate_root_model(

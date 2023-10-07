@@ -3,8 +3,10 @@ from unittest.mock import Mock
 
 import pytest
 from pydantic import BaseModel
+from pydantic_core import PydanticUndefined
 
 from pydantic_marshals.base.fields import properties
+from pydantic_marshals.base.fields.base import PatchDefault
 from tests.unit.conftest import DummyFactory, MockStack
 
 
@@ -80,6 +82,8 @@ def test_property_field_conversion(
     assert isinstance(field, properties.PropertyField)
     assert field.generate_type() is (type_override or dummy_factory("property_type"))
     assert field.generate_name() == "prop"
+    assert dict(field.generate_field_data()) == {"default": PydanticUndefined}
+    assert dict(field.as_patch().generate_field_data()) == {"default": PatchDefault}
 
 
 @pytest.mark.skip("isinstance doesn't support parametrized generics")
