@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 
 from pydantic import BaseModel
 from typing_extensions import Self
 
+from pydantic_marshals.base.fields.base import MarshalField, PatchMarshalField
 from pydantic_marshals.base.fields.properties import PropertyField, PropertyType
 from pydantic_marshals.base.models import MarshalModel
 from pydantic_marshals.sqlalchemy.fields.columns import ColumnField, ColumnType
@@ -66,3 +67,13 @@ class MappedModel(MarshalModel):
             bases=bases,
             includes=(self, *includes),
         )
+
+    def patch_fields(self) -> Iterator[MarshalField]:
+        for field in self.fields:
+            if isinstance(field, PatchMarshalField):
+                yield field.as_patch()
+            else:
+                yield field
+
+    def as_patch(self) -> Self:
+        return type(self)(*self.patch_fields(), bases=self.bases)

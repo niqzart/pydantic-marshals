@@ -8,6 +8,7 @@ from sqlalchemy.orm import MappedColumn
 from sqlalchemy.sql.schema import ScalarElementColumnDefault
 from sqlalchemy.sql.type_api import TypeEngine
 
+from pydantic_marshals.base.fields.base import PatchDefault
 from pydantic_marshals.sqlalchemy.fields.columns import ColumnField
 from tests.unit.conftest import DummyFactory, MockStack, SampleEnum
 
@@ -167,5 +168,11 @@ def test_generate_field_data(
     )
 
     assert dict(column_field.generate_field_data()) == expected
-
     generate_default_mock.assert_called_once_with()
+
+    generate_default_mock.reset_mock()
+    assert dict(column_field.as_patch().generate_field_data()) == {
+        **expected,
+        "default": PatchDefault,
+    }
+    generate_default_mock.assert_not_called()

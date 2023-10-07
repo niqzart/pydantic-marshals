@@ -3,8 +3,10 @@ from unittest.mock import Mock
 
 import pytest
 from pydantic import BaseModel
+from pydantic_core import PydanticUndefined
 from sqlalchemy.orm import Relationship
 
+from pydantic_marshals.base.fields.base import PatchDefault
 from pydantic_marshals.sqlalchemy.fields.relationships import RelationshipField
 from tests.unit.conftest import DummyFactory
 
@@ -99,5 +101,11 @@ def test_type_generation_collection_error(
     assert exc.value.args[0] == error_message
 
 
-def test_field_data_generation(relationship_field: RelationshipField) -> None:
-    assert dict(relationship_field.generate_field_data()) == {}
+@pytest.mark.parametrize("as_patch", [False, True])
+def test_field_data_generation(
+    relationship_field: RelationshipField, as_patch: bool
+) -> None:
+    expected = {"default": PatchDefault if as_patch else PydanticUndefined}
+    if as_patch:
+        relationship_field = relationship_field.as_patch()
+    assert dict(relationship_field.generate_field_data()) == expected

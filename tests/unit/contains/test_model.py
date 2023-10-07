@@ -6,7 +6,7 @@ import pytest
 from pydantic import RootModel
 
 from pydantic_marshals.base.fields.base import MarshalField
-from pydantic_marshals.contains.models import AssertContainsModel
+from pydantic_marshals.contains import AssertContainsModel
 from tests.unit.conftest import DummyException, DummyFactory, MockStack
 from tests.unit.contains.test_fields import SOURCE_TO_KLASS
 

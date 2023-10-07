@@ -11,12 +11,12 @@ from sqlalchemy.sql.schema import Column, ScalarElementColumnDefault
 from sqlalchemy.sql.sqltypes import String
 from typing_extensions import Self
 
-from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.fields.base import PatchMarshalField
 from pydantic_marshals.base.type_aliases import TypeHint
 from pydantic_marshals.utils import is_subtype
 
 
-class ColumnField(MarshalField):
+class ColumnField(PatchMarshalField):
     """
     Implementation of :py:class:`MarshalField` to use with SQLAlchemy's columns
     This will only work with 2.0-style MappedColumns
@@ -26,14 +26,18 @@ class ColumnField(MarshalField):
         self,
         mapped_column: MappedColumn[Any],
         alias: str | None = None,
+        patch: bool = False,
     ) -> None:
-        super().__init__(alias)
+        super().__init__(alias, patch)
         self.mapped = mapped_column
+
+    def as_patch(self) -> ColumnField:
+        return ColumnField(mapped_column=self.mapped, alias=self.alias, patch=True)
 
     @classmethod
     def convert(cls, source: Any = None, *_: Any) -> Self | None:
         if isinstance(source, MappedColumn):
-            return cls(source)
+            return cls(mapped_column=source)
         return None
 
     @property
@@ -59,8 +63,6 @@ class ColumnField(MarshalField):
 
     def generate_field_data(self) -> Iterator[tuple[str, Any]]:
         yield from super().generate_field_data()
-
-        yield "default", self.generate_default()
 
         column_type = self.column.type
         if isinstance(column_type, String) and not is_subtype(

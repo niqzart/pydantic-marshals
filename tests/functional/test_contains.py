@@ -7,11 +7,13 @@ from typing import Annotated, Any, Optional, Union
 import pytest
 from pydantic import ValidationError, conlist
 
-from pydantic_marshals.contains.models import AssertContainsModel, assert_contains
-from pydantic_marshals.contains.type_aliases import LiteralType, TypeChecker
-from pydantic_marshals.contains.type_generators.collections import (
+from pydantic_marshals.contains import (
+    AssertContainsModel,
+    TypeChecker,
     UnorderedLiteralCollection,
+    assert_contains,
 )
+from pydantic_marshals.contains.type_aliases import LiteralType
 from tests.unit.conftest import SampleEnum
 
 

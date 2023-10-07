@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 from collections.abc import Callable
 from typing import Any, get_type_hints
 
 from typing_extensions import Self
 
-from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.fields.base import PatchMarshalField
 from pydantic_marshals.base.type_aliases import TypeHint
 from pydantic_marshals.utils import ModeledType
 
 
-class PropertyField(MarshalField):
+class PropertyField(PatchMarshalField):
     """
     Implementation of :py:class:`MarshalField` to use with properties
     Can be used directly or with an added type hit override
@@ -19,8 +21,9 @@ class PropertyField(MarshalField):
         mapped_property: property,
         type_: TypeHint | None = None,
         alias: str | None = None,
+        patch: bool = False,
     ) -> None:
-        super().__init__(alias)
+        super().__init__(alias, patch)
         self.mapped_property = mapped_property
 
         if self.mapped_property.fget is None:
@@ -29,6 +32,9 @@ class PropertyField(MarshalField):
 
         self.name: str = self.getter.__name__
         self.type_: TypeHint = type_ or get_type_hints(self.getter).get("return", Any)
+
+    def as_patch(self) -> PropertyField:
+        return PropertyField(self.mapped_property, self.type_, self.alias, patch=True)
 
     @classmethod
     def convert(cls, mapped: Any = None, type_: Any = None, *_: Any) -> Self | None:

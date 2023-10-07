@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import pytest
 from pydantic import ValidationError
 
-from pydantic_marshals.contains.models import AssertContainsModel, assert_contains
+from pydantic_marshals.contains import AssertContainsModel, assert_contains
 from tests.unit.conftest import DummyFactory, MockStack
 
 

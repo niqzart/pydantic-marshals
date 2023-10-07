@@ -38,8 +38,9 @@ extend-ignore =
   WPS237  # screams at 'complex' f-strings
   WPS305  # f-strings are the best
   WPS306  # python 2.x is deprecated
-  WPS420  # pass is a thing
+  WPS410  # __all__ is required with mypy
   WPS412  # __init__ for libs is required
+  WPS420  # pass is a thing
   WPS430  # nested functions
   WPS431  # nested classes
   WPS451  # positional-only arguments

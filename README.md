@@ -25,6 +25,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
     description: Mapped[str | None] = mapped_column(Text())
+    admin: Mapped[bool] = mapped_column()  # empty `mapped_column()` is required for models
 
     avatar_id: Mapped[int] = mapped_column(ForeignKey("avatars.id"))
     avatar: Mapped[Avatar] = relationship()
@@ -35,20 +36,26 @@ class User(Base):
 
     BaseModel = MappedModel.create(columns=[id])
     CreateModel = MappedModel.create(columns=[name, description])
+    PatchModel = CreateModel.as_patch()
     IndexModel = MappedModel.create(properties=[representation])
     FullModel = BaseModel.extend(
+        columns=[admin],
         relationships=[(avatar, Avatar.IdModel)],
         includes=[CreateModel, IndexModel],
     )
 
 
 with sessionmaker.begin() as session:
-    user = User(name="alex", description="cool person", avatar=Avatar())
+    user = User(name="alex", description="cool person", avatar=Avatar(), admin=False)
     session.add(user)
     session.flush()
 
     print(User.BaseModel.model_validate(user).model_dump())
     # {"id": 0}
+    print(User.PatchModel.model_validate({}).model_dump(exclude_defaults=True))
+    # {}
+    print(User.PatchModel.model_validate({"description": None}).model_dump(exclude_defaults=True))
+    # {"description": None}
     print(User.CreateModel.model_validate(user).model_dump())
     # {"name": "alex", "description": "cool person"}
     print(User.IndexModel.model_validate(user).model_dump())
@@ -59,7 +66,8 @@ with sessionmaker.begin() as session:
     #   "name": "alex",
     #   "description": "cool person",
     #   "representation": "User #0: alex",
-    #   "avatar": {"id": 0}
+    #   "avatar": {"id": 0},
+    #   "admin": False
     # }
 ```
 
