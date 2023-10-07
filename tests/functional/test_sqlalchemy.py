@@ -8,7 +8,7 @@ from pydantic_core import PydanticUndefined
 from sqlalchemy import ForeignKey, MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from pydantic_marshals.sqlalchemy.models import MappedModel
+from pydantic_marshals.sqlalchemy import MappedModel
 from pydantic_marshals.utils import is_subtype
 from tests.unit.conftest import SampleEnum
 
