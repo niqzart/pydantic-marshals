@@ -16,7 +16,7 @@ from mypy.plugin import DynamicClassDefContext, Plugin
 # TODO redo and generalize
 base_model_qualname: Final = "pydantic_marshals.sqlalchemy.models.MappedModel"
 type_matrix = {base_model_qualname}
-methods = {"extend", "create"}
+methods = {"create", "extend", "as_patch"}
 
 pydantic_base_model_qualname: Final = "pydantic_marshals.base.models.MarshalBaseModel"
 stub_module_name: Final = "pydantic_marshals.mypy.magic"

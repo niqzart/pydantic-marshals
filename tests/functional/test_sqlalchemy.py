@@ -8,6 +8,7 @@ from pydantic_core import PydanticUndefined
 from sqlalchemy import ForeignKey, MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
+from pydantic_marshals.base.fields.base import PatchDefault
 from pydantic_marshals.sqlalchemy import MappedModel
 from pydantic_marshals.utils import is_subtype
 from tests.unit.conftest import SampleEnum
@@ -102,17 +103,29 @@ def column_model(
 
         Model = MappedModel.create(columns=[field])
         ExtendedModel = Model.extend()
+        PatchModel = Model.as_patch()
+        ExtendedPatchModel = PatchModel.extend()
 
     return T
+
+
+@pytest.fixture(params=[False, True], ids=["full", "patch"])
+def column_patch_mode(request: PytestRequest[bool]) -> bool:
+    return request.param
 
 
 @pytest.fixture(params=[False, True], ids=["normal", "extended"])
 def column_marshal_model(
     column_model: Any,
+    column_patch_mode: bool,
     request: PytestRequest[bool],
 ) -> type[BaseModel]:
     if request.param:
+        if column_patch_mode:
+            return column_model.ExtendedPatchModel  # type: ignore[no-any-return]
         return column_model.ExtendedModel  # type: ignore[no-any-return]
+    if column_patch_mode:
+        return column_model.PatchModel  # type: ignore[no-any-return]
     return column_model.Model  # type: ignore[no-any-return]
 
 
@@ -120,6 +133,7 @@ def test_column_model_inspection(
     column_type: Any,
     column_default: Any,
     column_nullable: bool,
+    column_patch_mode: bool,
     column_use_default: bool,
     column_marshal_model: type[BaseModel],
 ) -> None:
@@ -129,10 +143,20 @@ def test_column_model_inspection(
     field = column_marshal_model.model_fields.get("field")
     assert isinstance(field, FieldInfo)
     assert field.annotation == column_type
-    assert field.is_required() != (column_nullable or column_use_default)
-    if column_nullable:
-        expected_default = column_default if column_use_default else None
-        assert field.default is expected_default
+
+    expected_required = not (column_nullable or column_use_default or column_patch_mode)
+    assert field.is_required() == expected_required
+
+    if column_patch_mode:
+        expected_default = PatchDefault
+    elif column_use_default:
+        expected_default = column_default
+    elif column_nullable:
+        expected_default = None
+    else:
+        expected_default = PydanticUndefined
+
+    assert field.default is expected_default
 
 
 def test_column_model_usage(
