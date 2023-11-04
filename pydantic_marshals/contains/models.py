@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.models import FieldConverter
 from pydantic_marshals.base.type_aliases import FieldType, TypeHint
-from pydantic_marshals.contains.fields.constants import ConstantField
+from pydantic_marshals.contains.fields.constants import ConstantField, DatetimeField
 from pydantic_marshals.contains.fields.lists import strict_list_field_factory
 from pydantic_marshals.contains.fields.nested import nested_field_factory
 from pydantic_marshals.contains.fields.typed import GeneratedTypeField, TypedField
@@ -26,8 +26,10 @@ class AssertContainsModel(FieldConverter):
         SomethingField,
         AnythingField,
         ConstantField,
+        DatetimeField,
         TypedField,
         GeneratedTypeField,
+        # TODO plain object (with __eq__) field
     )
 
     @classmethod

@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from contextlib import ExitStack
+from datetime import datetime
 from enum import Enum
 from typing import Any, Protocol, overload
 from unittest.mock import Mock, PropertyMock, patch
@@ -13,6 +14,11 @@ DummyException = BaseException
 class SampleEnum(Enum):
     A = 1
     B = 2
+
+
+sample_datetime = datetime.utcnow()
+sample_date = sample_datetime.date()
+sample_time = sample_datetime.time()
 
 
 class DummyObject:

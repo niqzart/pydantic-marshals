@@ -1,3 +1,4 @@
+from datetime import date, datetime, time
 from typing import Annotated, Any, Literal, Optional, Union
 from unittest.mock import Mock
 
@@ -15,7 +16,14 @@ from pydantic_marshals.contains.type_generators.collections import (
     UnorderedLiteralCollection,
 )
 from pydantic_marshals.utils import is_subtype
-from tests.unit.conftest import DummyFactory, MockStack, SampleEnum
+from tests.unit.conftest import (
+    DummyFactory,
+    MockStack,
+    SampleEnum,
+    sample_date,
+    sample_datetime,
+    sample_time,
+)
 
 
 @pytest.fixture()
@@ -33,8 +41,8 @@ def convert_field_mock_to_sample(
     )
 
 
-NestedField = AssertContainsModel.field_types[6]  # type: ignore[misc]
-StrictListField = AssertContainsModel.field_types[7]  # type: ignore[misc]
+NestedField = AssertContainsModel.field_types[7]  # type: ignore[misc]
+StrictListField = AssertContainsModel.field_types[8]  # type: ignore[misc]
 
 SOURCE_TO_KLASS: list[Any] = [
     pytest.param(None, wildcards.NothingField, id="none_nothing"),
@@ -48,12 +56,20 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param("test", constants.ConstantField, id="str_constant"),
     pytest.param(SampleEnum.A, constants.ConstantField, id="enum_constant"),
     #
+    pytest.param(sample_datetime, constants.DatetimeField, id="datetime_object"),
+    pytest.param(sample_date, constants.DatetimeField, id="date_object"),
+    pytest.param(sample_time, constants.DatetimeField, id="time_object"),
+    #
     pytest.param(bool, typed.TypedField, id="bool_typed"),
     pytest.param(int, typed.TypedField, id="int_typed"),
     pytest.param(float, typed.TypedField, id="float_typed"),
     pytest.param(bytes, typed.TypedField, id="bytes_typed"),
     pytest.param(str, typed.TypedField, id="str_typed"),
     pytest.param(SampleEnum, typed.TypedField, id="enum_typed"),
+    #
+    pytest.param(datetime, typed.TypedField, id="datetime_typed"),
+    pytest.param(date, typed.TypedField, id="date_typed"),
+    pytest.param(time, typed.TypedField, id="time_typed"),
     #
     pytest.param(Optional[bool], typed.TypedField, id="optional_bool_typed"),
     pytest.param(Optional[int], typed.TypedField, id="optional_int_typed"),
@@ -62,12 +78,20 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param(Optional[str], typed.TypedField, id="optional_str_typed"),
     pytest.param(Optional[SampleEnum], typed.TypedField, id="optional_enum_typed"),
     #
+    pytest.param(Optional[datetime], typed.TypedField, id="optional_datetime_typed"),
+    pytest.param(Optional[date], typed.TypedField, id="optional_date_typed"),
+    pytest.param(Optional[time], typed.TypedField, id="optional_time_typed"),
+    #
     pytest.param(Union[bool], typed.TypedField, id="typing_union_bool_typed"),
     pytest.param(Union[int], typed.TypedField, id="typing_union_int_typed"),
     pytest.param(Union[float], typed.TypedField, id="typing_union_float_typed"),
     pytest.param(Union[bytes], typed.TypedField, id="typing_union_bytes_typed"),
     pytest.param(Union[str], typed.TypedField, id="typing_union_str_typed"),
     pytest.param(Union[SampleEnum], typed.TypedField, id="typing_union_enum_typed"),
+    #
+    pytest.param(Union[datetime], typed.TypedField, id="typing_union_datetime_typed"),
+    pytest.param(Union[date], typed.TypedField, id="typing_union_date_typed"),
+    pytest.param(Union[time], typed.TypedField, id="typing_union_time_typed"),
     #
     pytest.param(bool | None, typed.TypedField, id="pipe_union_bool_typed"),
     pytest.param(int | None, typed.TypedField, id="pipe_union_int_typed"),
@@ -76,12 +100,22 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param(str | None, typed.TypedField, id="pipe_union_str_typed"),
     pytest.param(SampleEnum | None, typed.TypedField, id="pipe_union_enum_typed"),
     #
+    pytest.param(datetime | None, typed.TypedField, id="pipe_union_datetime_typed"),
+    pytest.param(date | None, typed.TypedField, id="pipe_union_date_typed"),
+    pytest.param(time | None, typed.TypedField, id="pipe_union_time_typed"),
+    #
     pytest.param(Annotated[bool, 3], typed.TypedField, id="annotated_bool_typed"),
     pytest.param(Annotated[int, 3], typed.TypedField, id="annotated_int_typed"),
     pytest.param(Annotated[float, 3], typed.TypedField, id="annotated_float_typed"),
     pytest.param(Annotated[bytes, 3], typed.TypedField, id="annotated_bytes_typed"),
     pytest.param(Annotated[str, 3], typed.TypedField, id="annotated_str_typed"),
     pytest.param(Annotated[SampleEnum, 3], typed.TypedField, id="annotated_enum_typed"),
+    #
+    pytest.param(
+        Annotated[datetime, 3], typed.TypedField, id="annotated_datetime_typed"
+    ),
+    pytest.param(Annotated[date, 3], typed.TypedField, id="annotated_date_typed"),
+    pytest.param(Annotated[time, 3], typed.TypedField, id="annotated_time_typed"),
     #
     pytest.param(
         UnorderedLiteralCollection(set()),

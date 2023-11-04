@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Literal
+from datetime import date, time
+from typing import Annotated, Any, Literal, TypeVar
 
+from pydantic import AfterValidator
 from typing_extensions import Self
 
 from pydantic_marshals.base.fields.base import MarshalField
@@ -24,3 +26,27 @@ class ConstantField(MarshalField):
     def generate_type(self) -> TypeHint:
         # noinspection PyTypeHints
         return Literal[self.constant]  # pycharm bug
+
+
+T = TypeVar("T")
+
+
+class DatetimeField(MarshalField):
+    def __init__(self, timestamp: date | time) -> None:
+        super().__init__()
+        self.timestamp = timestamp
+        self.type_ = type(timestamp)
+
+    @classmethod
+    def convert(cls, timestamp: Any = None, *_: Any) -> Self | None:
+        if isinstance(timestamp, date | time):
+            return cls(timestamp)
+        return None
+
+    def constant_validator(self, value: T) -> T:
+        if value != self.timestamp:
+            raise ValueError(f"timestamp should be '{self.timestamp}'")
+        return value
+
+    def generate_type(self) -> TypeHint:
+        return Annotated[self.type_, AfterValidator(self.constant_validator)]

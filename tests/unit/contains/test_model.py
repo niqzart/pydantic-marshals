@@ -13,8 +13,8 @@ from tests.unit.contains.test_fields import SOURCE_TO_KLASS
 
 def test_field_types() -> None:
     types = AssertContainsModel.field_types
-    assert len(types) == 8
-    assert len(set(types)) == 8
+    assert len(types) == 9
+    assert len(set(types)) == 9
 
 
 @pytest.mark.parametrize(("source", "klass"), SOURCE_TO_KLASS)
