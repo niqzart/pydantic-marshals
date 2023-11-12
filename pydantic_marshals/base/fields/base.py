@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel, RootModel
@@ -73,7 +74,11 @@ class MarshalField:
         return RootModel[self.generate_type()]  # type: ignore[no-any-return, misc]
 
 
-PatchDefault = object()
+class PatchDefaultType(Enum):
+    PatchDefault = object()
+
+
+PatchDefault = PatchDefaultType.PatchDefault
 
 
 class PatchMarshalField(MarshalField):

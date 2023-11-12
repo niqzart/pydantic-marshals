@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pydantic-marshals"
-version = "0.3.8"
+version = "0.3.11"
 description = "Library for creating partial pydantic models (automatic converters) from different mappings"
 authors = ["niqzart <niqzart@gmail.com>"]
 readme = "README.md"
