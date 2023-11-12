@@ -25,19 +25,23 @@ class ColumnField(PatchMarshalField):
     def __init__(
         self,
         mapped_column: MappedColumn[Any],
+        type_: TypeHint | None = None,
         alias: str | None = None,
         patch: bool = False,
     ) -> None:
         super().__init__(alias, patch)
         self.mapped = mapped_column
+        self.type_override = type_
 
     def as_patch(self) -> ColumnField:
         return ColumnField(mapped_column=self.mapped, alias=self.alias, patch=True)
 
     @classmethod
-    def convert(cls, source: Any = None, *_: Any) -> Self | None:
-        if isinstance(source, MappedColumn):
-            return cls(mapped_column=source)
+    def convert(cls, source: Any = None, type_: Any = None, *_: Any) -> Self | None:
+        if isinstance(source, MappedColumn) and (
+            type_ is None or isinstance(type_, TypeHint)
+        ):
+            return cls(mapped_column=source, type_=type_)
         return None
 
     @property
@@ -48,6 +52,8 @@ class ColumnField(PatchMarshalField):
         return self.column.name
 
     def generate_type(self) -> TypeHint:
+        if self.type_override is not None:
+            return self.type_override
         type_: TypeHint = self.column.type.python_type
         if self.column.nullable:
             return type_ | None
@@ -72,4 +78,10 @@ class ColumnField(PatchMarshalField):
             yield "max_length", column_type.length
 
 
-ColumnType = MappedColumn[Any] | Mapped[Any] | ColumnField
+ColumnType = (
+    MappedColumn[Any]
+    | tuple[MappedColumn[Any], TypeHint]
+    | Mapped[Any]
+    | tuple[Mapped[Any], TypeHint]
+    | ColumnField
+)
