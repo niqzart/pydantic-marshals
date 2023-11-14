@@ -34,7 +34,12 @@ class ColumnField(PatchMarshalField):
         self.type_override = type_
 
     def as_patch(self) -> ColumnField:
-        return ColumnField(mapped_column=self.mapped, alias=self.alias, patch=True)
+        return ColumnField(
+            mapped_column=self.mapped,
+            type_=self.type_override,
+            alias=self.alias,
+            patch=True,
+        )
 
     @classmethod
     def convert(cls, source: Any = None, type_: Any = None, *_: Any) -> Self | None:
