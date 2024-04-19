@@ -6,6 +6,7 @@ from typing import Any, Protocol, overload
 from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
+from pydantic import BaseModel
 from pydantic_core import PydanticUndefined, PydanticUndefinedType
 
 DummyException = BaseException
@@ -19,6 +20,19 @@ class SampleEnum(Enum):
 sample_datetime = datetime.utcnow()
 sample_date = sample_datetime.date()
 sample_time = sample_datetime.time()
+
+
+class SampleType:
+    pass
+
+
+class SampleModel(BaseModel):
+    a: SampleEnum
+    b: datetime
+    c: int = 3
+
+
+sample_model_instance = SampleModel(a=SampleEnum.A, b=sample_datetime)
 
 
 class DummyObject:

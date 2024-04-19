@@ -1,13 +1,13 @@
 from collections.abc import Iterator
 from typing import Any, ClassVar
 
-from pydantic import BaseModel, create_model
+from pydantic import BaseModel, create_model, ConfigDict
 
 from pydantic_marshals.base.fields.base import MarshalField
 
 
-class MarshalBaseModel(BaseModel, from_attributes=True, populate_by_name=True):
-    pass
+class MarshalBaseModel(BaseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class FieldConverter:

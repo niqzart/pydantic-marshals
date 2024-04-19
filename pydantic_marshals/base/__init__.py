@@ -1,4 +1,4 @@
 from pydantic_marshals.base.fields.base import PatchDefault, PatchDefaultType
-from pydantic_marshals.base.models import MarshalBaseModel, MarshalModel
+from pydantic_marshals.base.models import MarshalModel
 
-__all__ = ("MarshalBaseModel", "MarshalModel", "PatchDefault", "PatchDefaultType")
+__all__ = ("MarshalModel", "PatchDefault", "PatchDefaultType")

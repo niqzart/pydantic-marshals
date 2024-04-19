@@ -19,7 +19,7 @@ extend-ignore =
   PT011  # too broad exception in `pytest.raises` (ValueErrors are needed ib pydantic)
 
   # black
-  WPS348 WPS464 E302 C812 C815
+  WPS348 WPS464 E302 E501 C812 C815
   # weird
   PIE803 C101 FNE008 ANN101 ANN102 WPS100 WPS111 WPS338
   # broken
@@ -32,7 +32,7 @@ extend-ignore =
   P103  # unreadable (what?)
 
   # too many
-  WPS201 WPS204 WPS210 WPS211 WPS214 WPS218 WPS219 WPS212 WPS221 WPS227 WPS231 WPS232 WPS235
+  WPS201 WPS204 WPS210 WPS211 WPS214 WPS218 WPS219 WPS212 WPS221 WPS227 WPS231 WPS232 WPS234 WPS235
 
   # don't block features
   WPS237  # screams at 'complex' f-strings

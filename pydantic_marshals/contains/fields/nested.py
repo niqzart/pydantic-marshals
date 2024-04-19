@@ -4,7 +4,7 @@ from collections.abc import Callable
 from contextlib import suppress
 from typing import Any
 
-from pydantic import create_model
+from pydantic import ConfigDict, create_model
 from typing_extensions import Self
 
 from pydantic_marshals.base.fields.base import MarshalField
@@ -25,7 +25,15 @@ def nested_field_factory(  # noqa: N802
                         key: convert_field(value) for key, value in source.items()
                     }  # TODO check if `isinstance(value, TypeChecker)`
                     return cls(
-                        create_model("Model", **fields),  # type: ignore[call-overload]
+                        create_model(  # type: ignore[call-overload]
+                            "Model",
+                            **fields,
+                            __config__=ConfigDict(  # TODO maybe move to `contains`
+                                from_attributes=True,
+                                populate_by_name=True,
+                                arbitrary_types_allowed=True,
+                            ),
+                        ),
                     )
             return None
 
