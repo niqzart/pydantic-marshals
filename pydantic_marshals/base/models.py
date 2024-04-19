@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from typing import Any, ClassVar
 
-from pydantic import BaseModel, create_model, ConfigDict
+from pydantic import BaseModel, ConfigDict, create_model
 
 from pydantic_marshals.base.fields.base import MarshalField
 
@@ -22,8 +22,18 @@ class FieldConverter:
         """
         yield from ()  # noqa: WPS353
 
+    default_field_type: type[MarshalField] | None = None
+    """Last field type to try if others don't work"""
+
+    @classmethod
+    def collect_field_types(cls) -> Iterator[type[MarshalField]]:
+        yield from cls.field_types
+        yield from cls.dynamic_field_types()
+        if cls.default_field_type is not None:
+            yield cls.default_field_type
+
     def __init_subclass__(cls, **_: Any) -> None:
-        cls.field_types = (*cls.field_types, *cls.dynamic_field_types())
+        cls.field_types = tuple(cls.collect_field_types())
 
     @classmethod
     def convert_field(cls, raw_field: Any) -> MarshalField:

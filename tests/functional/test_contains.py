@@ -157,15 +157,15 @@ def test_complex_fail() -> None:
         ("r",): {"type": "value_error", "msg": "Value error, extra items found: {2}"},
         ("dt",): {
             "type": "value_error",
-            "msg": f"Value error, timestamp should be '{sample_datetime}'",
+            "msg": f"Value error, should be equal to '{sample_datetime}'",
         },
         ("dd",): {
             "type": "value_error",
-            "msg": f"Value error, timestamp should be '{sample_date}'",
+            "msg": f"Value error, should be equal to '{sample_date}'",
         },
         ("tt",): {
             "type": "value_error",
-            "msg": f"Value error, timestamp should be '{sample_time}'",
+            "msg": f"Value error, should be equal to '{sample_time}'",
         },
     }
 

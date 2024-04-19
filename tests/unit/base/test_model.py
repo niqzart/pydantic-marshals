@@ -8,7 +8,7 @@ from pydantic import create_model
 
 from pydantic_marshals.base import models
 from pydantic_marshals.base.fields.base import MarshalField
-from pydantic_marshals.contains.models import assert_contains
+from pydantic_marshals.contains import assert_contains
 from tests.unit.conftest import DummyFactory, MockStack
 
 
