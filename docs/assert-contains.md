@@ -52,10 +52,46 @@ assert_contains(3, 3)  # no errors raised
 assert_contains(5, 3)  # ValidationError: Input should be 3 [type=literal_error, input_value=5, input_type=int]
 ```
 
+### Date/Time Values
+For convenience `datetime`, `date` and `time` objects can be used as constant comparators:
+```py
+from datetime import datetime, date, time
+from pydantic_marshals.contains import assert_contains
+
+
+def test_timetable():
+    assert_contains(
+        get_monday_task(),
+        {
+            "date": date(2023, 11, 3),
+            "time": time(13, 30, 21),
+            "created": datetime(2023, 2, 18, 3, 46, 54),
+        }
+    )
+```
+These comparisons do check the data type the same as [pydantic would](https://docs.pydantic.dev/2.1/errors/validation_errors/#date_from_datetime_inexact)
+
+### Arbitrary Objects
+As well as datetime, other objects can be compared based on their `__eq__` method. This can be extremely useful for comparing data-objects, such as dataclasses or pydantic models:
+```py
+from dataclasses import dataclass
+from pydantic_marshals.contains import assert_contains
+
+@dataclass()
+class MyClass:
+    t: int
+
+def test_object():
+    assert_contains(
+        get_some_object(),
+        MyClass(4),
+    )
+```
+
 ### Only checking the type
 Sometimes you do not know the exact value of a field, but you might need to check its type and some type-based constraints (like string length). For this you can use:
 
-- Exact types, including custom classes
+- Exact types, including custom classes and ones pydantic sees as "arbitrary"
 - [Constrained types](https://docs.pydantic.dev/usage/types/#constrained-types) for additional checks
 - [Strict types](https://docs.pydantic.dev/usage/types/#strict-types) to disable type conversion
 - Anything that is a subclass of `type` and [works in `pydantic`](https://docs.pydantic.dev/usage/types/) should also work (not guaranteed)
@@ -153,8 +189,7 @@ def test_pydantic():
 ```
 
 ### Custom Types
-Pydantic allows [custom data types](https://docs.pydantic.dev/2.0/usage/types/custom) via `Annotated`. These are also supported in assert-contains, including pydantic-agnostic variants from [`annotated-types`](https://github.com/annotated-types/annotated-types) and complex checks via [`AfterValidator`](https://docs.pydantic.dev/2.0/usage/types/custom/#adding-validation-and-serialization).
-In addition to that, assert-contains offers a few useful [custom-type generators](#type-generators)
+Pydantic allows [custom data types](https://docs.pydantic.dev/2.0/usage/types/custom) via `Annotated`. These are also supported in assert-contains, including pydantic-agnostic variants from [`annotated-types`](https://github.com/annotated-types/annotated-types) and complex checks via [`AfterValidator`](https://docs.pydantic.dev/2.0/usage/types/custom/#adding-validation-and-serialization)
 
 ```py
 from typing import Annotated
@@ -179,6 +214,8 @@ def test_custom():
         },
     )
 ```
+
+In addition to that, assert-contains offers a few useful [custom-type generators](#type-generators)
 
 ## Utils
 ### Type Generators

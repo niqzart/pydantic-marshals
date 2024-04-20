@@ -1,14 +1,25 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
+from enum import Enum
+from typing import Any, ClassVar, Generic, TypeVar
 
-from pydantic import BaseModel, RootModel
+from pydantic import ConfigDict, RootModel
 from pydantic.fields import Field
 from pydantic_core import PydanticUndefined, PydanticUndefinedType
 from typing_extensions import Self
 
 from pydantic_marshals.base.type_aliases import FieldType, TypeHint
+
+T = TypeVar("T")
+
+
+class MarshalRootModel(RootModel[T], Generic[T]):
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+    )
 
 
 class MarshalField:
@@ -17,6 +28,9 @@ class MarshalField:
     This is an interface, and it requires implementing all methods to function
     and to be used in :py:class:`pydantic_marshals.models.base.MarshalModel`
     """
+
+    marshal_root_model: ClassVar[type[RootModel[Any]]] = MarshalRootModel
+    """Base root model class. Subclasses of :py:class:`MarshalRootModel` are recommended"""
 
     def __init__(self, alias: str | None = None) -> None:
         """
@@ -69,11 +83,16 @@ class MarshalField:
             Field(**dict(self.generate_field_data())),
         )
 
-    def generate_root_model(self) -> type[BaseModel]:
-        return RootModel[self.generate_type()]  # type: ignore[no-any-return, misc]
+    def generate_root_model(self) -> type[RootModel[Any]]:
+        # TODO maybe move to `contains`
+        return self.marshal_root_model[self.generate_type()]  # type: ignore[no-any-return, index]
 
 
-PatchDefault = object()
+class PatchDefaultType(Enum):
+    PatchDefault = object()
+
+
+PatchDefault = PatchDefaultType.PatchDefault
 
 
 class PatchMarshalField(MarshalField):

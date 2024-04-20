@@ -1,13 +1,18 @@
+from datetime import date, datetime, time
 from typing import Annotated, Any, Literal, Optional, Union
 from unittest.mock import Mock
 
 import pytest
-from pydantic import BaseModel
+from pydantic import AfterValidator, BaseModel
 from pydantic.fields import FieldInfo
 
 from pydantic_marshals.base.fields.base import MarshalField
 from pydantic_marshals.base.type_aliases import TypeHint
-from pydantic_marshals.contains.fields import constants, typed, wildcards
+from pydantic_marshals.contains.fields import typed, wildcards
+from pydantic_marshals.contains.fields.constants import (
+    ArbitraryConstantField,
+    LiteralConstantField,
+)
 from pydantic_marshals.contains.models import AssertContainsModel
 from pydantic_marshals.contains.type_aliases import LiteralType
 from pydantic_marshals.contains.type_generators.base import BaseTypeGenerator
@@ -15,7 +20,17 @@ from pydantic_marshals.contains.type_generators.collections import (
     UnorderedLiteralCollection,
 )
 from pydantic_marshals.utils import is_subtype
-from tests.unit.conftest import DummyFactory, MockStack, SampleEnum
+from tests.unit.conftest import (
+    DummyFactory,
+    MockStack,
+    SampleEnum,
+    SampleModel,
+    SampleType,
+    sample_date,
+    sample_datetime,
+    sample_model_instance,
+    sample_time,
+)
 
 
 @pytest.fixture()
@@ -41,12 +56,18 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param(..., wildcards.SomethingField, id="..._something"),
     pytest.param(Any, wildcards.AnythingField, id="any_anything"),
     #
-    pytest.param(True, constants.ConstantField, id="bool_constant"),
-    pytest.param(1, constants.ConstantField, id="int_constant"),
-    pytest.param(1.1, constants.ConstantField, id="float_constant"),
-    pytest.param(b"test", constants.ConstantField, id="bytes_constant"),
-    pytest.param("test", constants.ConstantField, id="str_constant"),
-    pytest.param(SampleEnum.A, constants.ConstantField, id="enum_constant"),
+    pytest.param(True, LiteralConstantField, id="bool_constant"),
+    pytest.param(1, LiteralConstantField, id="int_constant"),
+    pytest.param(1.1, LiteralConstantField, id="float_constant"),
+    pytest.param(b"test", LiteralConstantField, id="bytes_constant"),
+    pytest.param("test", LiteralConstantField, id="str_constant"),
+    pytest.param(SampleEnum.A, LiteralConstantField, id="enum_constant"),
+    #
+    pytest.param(sample_datetime, ArbitraryConstantField, id="datetime_object"),
+    pytest.param(sample_date, ArbitraryConstantField, id="date_object"),
+    pytest.param(sample_time, ArbitraryConstantField, id="time_object"),
+    #
+    pytest.param(sample_model_instance, ArbitraryConstantField, id="arbitrary_object"),
     #
     pytest.param(bool, typed.TypedField, id="bool_typed"),
     pytest.param(int, typed.TypedField, id="int_typed"),
@@ -55,12 +76,24 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param(str, typed.TypedField, id="str_typed"),
     pytest.param(SampleEnum, typed.TypedField, id="enum_typed"),
     #
+    pytest.param(datetime, typed.TypedField, id="datetime_typed"),
+    pytest.param(date, typed.TypedField, id="date_typed"),
+    pytest.param(time, typed.TypedField, id="time_typed"),
+    pytest.param(SampleModel, typed.TypedField, id="pydantic_typed"),
+    pytest.param(SampleType, typed.TypedField, id="arbitrary_typed"),
+    #
     pytest.param(Optional[bool], typed.TypedField, id="optional_bool_typed"),
     pytest.param(Optional[int], typed.TypedField, id="optional_int_typed"),
     pytest.param(Optional[float], typed.TypedField, id="optional_float_typed"),
     pytest.param(Optional[bytes], typed.TypedField, id="optional_bytes_typed"),
     pytest.param(Optional[str], typed.TypedField, id="optional_str_typed"),
     pytest.param(Optional[SampleEnum], typed.TypedField, id="optional_enum_typed"),
+    #
+    pytest.param(Optional[datetime], typed.TypedField, id="optional_datetime_typed"),
+    pytest.param(Optional[date], typed.TypedField, id="optional_date_typed"),
+    pytest.param(Optional[time], typed.TypedField, id="optional_time_typed"),
+    pytest.param(Optional[SampleModel], typed.TypedField, id="optional_pydantic_typed"),
+    pytest.param(Optional[SampleType], typed.TypedField, id="optional_arbitrary_typed"),
     #
     pytest.param(Union[bool], typed.TypedField, id="typing_union_bool_typed"),
     pytest.param(Union[int], typed.TypedField, id="typing_union_int_typed"),
@@ -69,6 +102,16 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param(Union[str], typed.TypedField, id="typing_union_str_typed"),
     pytest.param(Union[SampleEnum], typed.TypedField, id="typing_union_enum_typed"),
     #
+    pytest.param(Union[datetime], typed.TypedField, id="typing_union_datetime_typed"),
+    pytest.param(Union[date], typed.TypedField, id="typing_union_date_typed"),
+    pytest.param(Union[time], typed.TypedField, id="typing_union_time_typed"),
+    pytest.param(
+        Union[SampleModel], typed.TypedField, id="typing_union_pydantic_typed"
+    ),
+    pytest.param(
+        Union[SampleType], typed.TypedField, id="typing_union_arbitrary_typed"
+    ),
+    #
     pytest.param(bool | None, typed.TypedField, id="pipe_union_bool_typed"),
     pytest.param(int | None, typed.TypedField, id="pipe_union_int_typed"),
     pytest.param(float | None, typed.TypedField, id="pipe_union_float_typed"),
@@ -76,12 +119,30 @@ SOURCE_TO_KLASS: list[Any] = [
     pytest.param(str | None, typed.TypedField, id="pipe_union_str_typed"),
     pytest.param(SampleEnum | None, typed.TypedField, id="pipe_union_enum_typed"),
     #
+    pytest.param(datetime | None, typed.TypedField, id="pipe_union_datetime_typed"),
+    pytest.param(date | None, typed.TypedField, id="pipe_union_date_typed"),
+    pytest.param(time | None, typed.TypedField, id="pipe_union_time_typed"),
+    pytest.param(SampleModel | None, typed.TypedField, id="pipe_union_pydantic_typed"),
+    pytest.param(SampleType | None, typed.TypedField, id="pipe_union_arbitrary_typed"),
+    #
     pytest.param(Annotated[bool, 3], typed.TypedField, id="annotated_bool_typed"),
     pytest.param(Annotated[int, 3], typed.TypedField, id="annotated_int_typed"),
     pytest.param(Annotated[float, 3], typed.TypedField, id="annotated_float_typed"),
     pytest.param(Annotated[bytes, 3], typed.TypedField, id="annotated_bytes_typed"),
     pytest.param(Annotated[str, 3], typed.TypedField, id="annotated_str_typed"),
     pytest.param(Annotated[SampleEnum, 3], typed.TypedField, id="annotated_enum_typed"),
+    #
+    pytest.param(
+        Annotated[datetime, 3], typed.TypedField, id="annotated_datetime_typed"
+    ),
+    pytest.param(Annotated[date, 3], typed.TypedField, id="annotated_date_typed"),
+    pytest.param(Annotated[time, 3], typed.TypedField, id="annotated_time_typed"),
+    pytest.param(
+        Annotated[SampleModel, 3], typed.TypedField, id="annotated_pydantic_typed"
+    ),
+    pytest.param(
+        Annotated[SampleType, 3], typed.TypedField, id="annotated_arbitrary_typed"
+    ),
     #
     pytest.param(
         UnorderedLiteralCollection(set()),
@@ -105,6 +166,8 @@ def test_klass_skips(source: Any, exclude_klass: type[MarshalField]) -> None:
     klass: type[MarshalField]
     for klass in AssertContainsModel.field_types:
         if klass is exclude_klass:
+            continue
+        if klass is AssertContainsModel.default_field_type:
             continue
         assert klass.convert(source) is None
 
@@ -147,9 +210,9 @@ def test_wildcard_generation(
     ],
 )
 def test_constant_generation(source: LiteralType) -> None:
-    field = constants.ConstantField.convert(source)
+    field = LiteralConstantField.convert(source)
 
-    assert isinstance(field, constants.ConstantField)
+    assert isinstance(field, LiteralConstantField)
     # noinspection PyTypeHints
     assert field.generate_type() is Literal[source]
     assert dict(field.generate_field_data()) == {}
@@ -164,6 +227,8 @@ def test_constant_generation(source: LiteralType) -> None:
         pytest.param(bytes, id="bytes"),
         pytest.param(str, id="str"),
         pytest.param(SampleEnum, id="enum"),
+        pytest.param(SampleModel, id="pydantic_model"),
+        pytest.param(SampleType, id="arbitrary_type"),
     ],
 )
 @pytest.mark.parametrize("kind", ["normal", "optional", "typing_union", "pipe_union"])
@@ -179,6 +244,28 @@ def test_typed_generation(source: TypeHint, kind: str) -> None:
 
     assert isinstance(field, typed.TypedField)
     assert field.generate_type() is source
+    assert dict(field.generate_field_data()) == {}
+
+
+@pytest.mark.parametrize(
+    ("source", "expected_type"),
+    [
+        pytest.param(sample_time, time, id="time"),
+        pytest.param(sample_date, date, id="date"),
+        pytest.param(sample_datetime, datetime, id="datetime"),
+        pytest.param(sample_model_instance, SampleModel, id="pydantic_model"),
+        pytest.param(SampleType(), SampleType, id="arbitrary_object"),
+    ],
+)
+def test_arbitrary_generation(source: Any, expected_type: type) -> None:
+    field: ArbitraryConstantField[Any] | None = ArbitraryConstantField.convert(source)
+
+    assert isinstance(field, ArbitraryConstantField)
+    # noinspection PyTypeHints
+    assert (
+        field.generate_type()
+        is Annotated[expected_type, AfterValidator(field.equality_validator)]
+    )
     assert dict(field.generate_field_data()) == {}
 
 

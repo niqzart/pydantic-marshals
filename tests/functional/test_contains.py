@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from datetime import date, datetime, timedelta
 from enum import Enum
 from typing import Annotated, Any, Optional, Union
 
@@ -14,7 +15,7 @@ from pydantic_marshals.contains import (
     assert_contains,
 )
 from pydantic_marshals.contains.type_aliases import LiteralType
-from tests.unit.conftest import SampleEnum
+from tests.unit.conftest import SampleEnum, sample_date, sample_datetime, sample_time
 
 
 class LiteralValue(Enum):
@@ -40,6 +41,16 @@ class LiteralValue(Enum):
         return self.name.lower()
 
 
+class DatetimeValue(Enum):
+    TIME = datetime.utcnow().time()
+    DATE = date.today()
+    DATETIME = datetime.utcnow()
+
+    @property
+    def slug(self) -> str:
+        return self.name.lower()
+
+
 @pytest.mark.parametrize(
     "common_modifier",
     [
@@ -53,7 +64,7 @@ class LiteralValue(Enum):
     ("type_checker", "literal_value"),
     [
         pytest.param(type_checker, literal, id=f"{converter_slug}-{literal.slug}")
-        for literal in LiteralValue
+        for literal in (*LiteralValue, *DatetimeValue)
         for type_checker, converter_slug in (
             (Any, "any"),
             (..., "..."),
@@ -96,6 +107,9 @@ def test_complex_fail() -> None:
                 "r": [4, "hey", True, 4, "hey", True, 2],
                 "s": [4, "hey", True, 4, "hey", True, 4, "hey", True],
                 "w": str,
+                "dt": sample_datetime + timedelta(days=1),
+                "dd": sample_date + timedelta(days=1),
+                "tt": (sample_datetime + timedelta(hours=1)).time(),
             },
             {
                 "a": "3",
@@ -114,6 +128,9 @@ def test_complex_fail() -> None:
                 "s": UnorderedLiteralCollection(
                     items={True, "hey", 4},
                 ),
+                "dt": sample_datetime,
+                "dd": sample_date,
+                "tt": sample_time,
             },
         )
 
@@ -138,6 +155,18 @@ def test_complex_fail() -> None:
         ("e", "b"): {"type": "missing", "msg": "Field required"},
         ("l",): {"type": "value_error", "msg": "Value error, items missing: {'hey'}"},
         ("r",): {"type": "value_error", "msg": "Value error, extra items found: {2}"},
+        ("dt",): {
+            "type": "value_error",
+            "msg": f"Value error, should be equal to '{sample_datetime}'",
+        },
+        ("dd",): {
+            "type": "value_error",
+            "msg": f"Value error, should be equal to '{sample_date}'",
+        },
+        ("tt",): {
+            "type": "value_error",
+            "msg": f"Value error, should be equal to '{sample_time}'",
+        },
     }
 
 

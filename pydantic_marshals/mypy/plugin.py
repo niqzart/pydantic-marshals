@@ -49,6 +49,7 @@ def add_info_hook(ctx: DynamicClassDefContext) -> None:
     bm = ctx.api.named_type(pydantic_base_model_qualname)
     pm = ctx.api.named_type(stub_class_name)
     info.bases = [bm, pm]
+    info.fallback_to_any = True
     calculate_mro(info)
 
     ctx.api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, info))
