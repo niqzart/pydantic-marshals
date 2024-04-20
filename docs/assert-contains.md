@@ -71,10 +71,27 @@ def test_timetable():
 ```
 These comparisons do check the data type the same as [pydantic would](https://docs.pydantic.dev/2.1/errors/validation_errors/#date_from_datetime_inexact)
 
+### Arbitrary Objects
+As well as datetime, other objects can be compared based on their `__eq__` method. This can be extremely useful for comparing data-objects, such as dataclasses or pydantic models:
+```py
+from dataclasses import dataclass
+from pydantic_marshals.contains import assert_contains
+
+@dataclass()
+class MyClass:
+    t: int
+
+def test_object():
+    assert_contains(
+        get_some_object(),
+        MyClass(4),
+    )
+```
+
 ### Only checking the type
 Sometimes you do not know the exact value of a field, but you might need to check its type and some type-based constraints (like string length). For this you can use:
 
-- Exact types, including custom classes
+- Exact types, including custom classes and ones pydantic sees as "arbitrary"
 - [Constrained types](https://docs.pydantic.dev/usage/types/#constrained-types) for additional checks
 - [Strict types](https://docs.pydantic.dev/usage/types/#strict-types) to disable type conversion
 - Anything that is a subclass of `type` and [works in `pydantic`](https://docs.pydantic.dev/usage/types/) should also work (not guaranteed)
