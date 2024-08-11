@@ -30,7 +30,6 @@ def nested_field_factory(  # noqa: N802
                             **fields,
                             __config__=ConfigDict(  # TODO maybe move to `contains`
                                 from_attributes=True,
-                                populate_by_name=True,
                                 arbitrary_types_allowed=True,
                             ),
                         ),

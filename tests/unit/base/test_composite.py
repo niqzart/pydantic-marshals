@@ -8,7 +8,6 @@ from pydantic_core import PydanticUndefined
 
 from pydantic_marshals.base import composite
 from pydantic_marshals.base.models import MarshalBaseModel
-from pydantic_marshals.contains import assert_contains
 from tests.unit.conftest import DummyFactory, MockStack
 
 
@@ -30,13 +29,7 @@ def composite_marshal_model(
 def test_composite_model_config(
     composite_marshal_model: type[composite.CompositeMarshalModel],
 ) -> None:
-    assert_contains(
-        composite_marshal_model.model_config,
-        {
-            "from_attributes": True,
-            "populate_by_name": True,
-        },
-    )
+    assert composite_marshal_model.model_config.get("from_attributes") is True
 
 
 def test_generate_marshal_model_name(

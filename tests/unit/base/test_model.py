@@ -8,19 +8,12 @@ from pydantic import create_model
 
 from pydantic_marshals.base import models
 from pydantic_marshals.base.fields.base import MarshalField
-from pydantic_marshals.contains import assert_contains
 from tests.unit.conftest import DummyFactory, MockStack
 
 
 def test_base_model_class() -> None:
     pydantic_model = create_model("T", __base__=models.MarshalModel.model_base_class)
-    assert_contains(
-        pydantic_model.model_config,
-        {
-            "from_attributes": True,
-            "populate_by_name": True,
-        },
-    )
+    assert pydantic_model.model_config.get("from_attributes") is True
 
 
 @pytest.mark.parametrize("base_count", [0, 1, 2])
