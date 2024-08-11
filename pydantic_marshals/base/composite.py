@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, get_origin
 
 from pydantic import BaseModel, create_model
 from pydantic.fields import FieldInfo
@@ -17,6 +17,8 @@ class CompositeMarshalModel(MarshalBaseModel):
     @classmethod
     def convert_field(cls, field: FieldInfo) -> tuple[Any, Any]:
         if len(field.metadata) == 1 and is_subtype(field.metadata[0], MarshalBaseModel):
+            if is_subtype(get_origin(field.annotation), list):
+                return list[field.metadata[0]], field.default  # type: ignore
             if is_optional(field.annotation):
                 return field.metadata[0] | None, field.default
             return field.metadata[0], field.default

@@ -71,31 +71,39 @@ some_marshal_model = create_model("T", __base__=MarshalBaseModel)
 @pytest.mark.parametrize(
     (
         "initial_annotation",
-        "initial_default",
         "expected_annotation",
-        "expected_default",
+        "default",
     ),
     [
         pytest.param(
             Annotated[int, some_marshal_model],
-            PydanticUndefined,
             some_marshal_model,
             PydanticUndefined,
             id="required",
         ),
         pytest.param(
             Annotated[int | None, some_marshal_model],
-            PydanticUndefined,
             some_marshal_model | None,
             PydanticUndefined,
             id="required_union",
         ),
         pytest.param(
             Annotated[int | None, some_marshal_model],
-            None,
             some_marshal_model | None,
             None,
             id="optional",
+        ),
+        pytest.param(
+            Annotated[list[int], some_marshal_model],
+            list[some_marshal_model],  # type: ignore[valid-type]
+            PydanticUndefined,
+            id="list",
+        ),
+        pytest.param(
+            Annotated[list[int], some_marshal_model],
+            list[some_marshal_model],  # type: ignore[valid-type]
+            [],
+            id="list_with_default",
         ),
     ],
 )
@@ -103,13 +111,10 @@ def test_convert_field_unpacked(
     mock_stack: MockStack,
     composite_marshal_model: type[composite.CompositeMarshalModel],
     initial_annotation: Any,
-    initial_default: Any,
     expected_annotation: Any,
-    expected_default: Any,
+    default: Any,
 ) -> None:
-    some_field_info = FieldInfo.from_annotated_attribute(
-        initial_annotation, initial_default
-    )
+    some_field_info = FieldInfo.from_annotated_attribute(initial_annotation, default)
 
     converted_field = composite_marshal_model.convert_field(some_field_info)
 
@@ -117,7 +122,7 @@ def test_convert_field_unpacked(
     assert len(converted_field) == 2
 
     assert converted_field[0] == expected_annotation
-    assert converted_field[1] is expected_default
+    assert converted_field[1] is default
 
 
 def test_build_marshal(
