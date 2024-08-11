@@ -7,7 +7,7 @@ from pydantic_marshals.base.fields.base import MarshalField
 
 
 class MarshalBaseModel(BaseModel):
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class FieldConverter:
