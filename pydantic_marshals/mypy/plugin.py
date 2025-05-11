@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import Final
 
+from mypy.build import PRI_ALL
 from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
@@ -38,7 +39,8 @@ class MarshalsPlugin(Plugin):
         return None
 
     def get_additional_deps(self, file: MypyFile) -> list[tuple[int, str, int]]:
-        return [(10, stub_module_name, -1)]
+        # Without PRI_ALL causes pydantic.mypy to not activate for some reason
+        return [(PRI_ALL, stub_module_name, -1)]
 
 
 def add_info_hook(ctx: DynamicClassDefContext) -> None:
