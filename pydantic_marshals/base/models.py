@@ -113,7 +113,9 @@ class MarshalModel(FieldConverter):
 
     def generate_base(self) -> type[BaseModel] | tuple[type[BaseModel], ...]:
         """Generate __base__ argument for :py:func:`create_model`"""
-        return self.model_base_class, *self.bases
+        if len(self.bases) == 0:
+            return self.model_base_class
+        return tuple(self.bases)
 
     def generate_model(self) -> type[BaseModel]:
         """Generate the pydantic model"""

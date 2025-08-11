@@ -22,10 +22,13 @@ def test_generate_base(dummy_factory: DummyFactory, base_count: int) -> None:
 
     real_bases = model.generate_base()
     assert isinstance(real_bases, tuple)
-    assert len(real_bases) == base_count + 1
-    assert real_bases[0] is models.MarshalBaseModel
-    for i in range(base_count):
-        assert real_bases[i + 1] is dummy_factory(i)
+    if base_count == 0:
+        assert len(real_bases) == 1
+        assert real_bases[0] is models.MarshalBaseModel
+    else:
+        assert len(real_bases) == base_count
+        for i in range(base_count):
+            assert real_bases[i] is dummy_factory(i)
 
 
 def test_generated_model_caching(
