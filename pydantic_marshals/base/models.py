@@ -8,7 +8,7 @@ from pydantic_marshals.base.type_aliases import FieldType
 
 
 class MarshalBaseModel(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class FieldConverter:
