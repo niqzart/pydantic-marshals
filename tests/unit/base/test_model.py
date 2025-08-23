@@ -18,14 +18,16 @@ def test_base_model_class() -> None:
 
 @pytest.mark.parametrize("base_count", [0, 1, 2])
 def test_generate_base(dummy_factory: DummyFactory, base_count: int) -> None:
-    model = models.MarshalModel(bases=[dummy_factory(i) for i in range(base_count)])
+    model = models.MarshalModel(
+        bases=[dummy_factory(i) for i in range(base_count)],
+        extra_fields={},
+    )
 
-    real_bases = model.generate_base()
-    assert isinstance(real_bases, tuple)
     if base_count == 0:
-        assert len(real_bases) == 1
-        assert real_bases[0] is models.MarshalBaseModel
+        assert model.generate_base() is models.MarshalBaseModel
     else:
+        real_bases = model.generate_base()
+        assert isinstance(real_bases, tuple)
         assert len(real_bases) == base_count
         for i in range(base_count):
             assert real_bases[i] is dummy_factory(i)
@@ -35,7 +37,7 @@ def test_generated_model_caching(
     dummy_factory: DummyFactory,
     mock_stack: MockStack,
 ) -> None:
-    model = models.MarshalModel(bases=[])
+    model = models.MarshalModel(bases=[], extra_fields={})
     generate_model_mock = mock_stack.enter_mock(
         model, "generate_model", return_value=dummy_factory("return")
     )
@@ -51,7 +53,7 @@ def test_generated_model_caching(
 
 @pytest.fixture()
 def simple_model() -> models.MarshalModel:
-    return models.MarshalModel(bases=[])
+    return models.MarshalModel(bases=[], extra_fields={})
 
 
 @pytest.fixture()

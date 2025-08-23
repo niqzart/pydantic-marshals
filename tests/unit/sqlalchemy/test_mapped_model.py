@@ -86,6 +86,7 @@ def test_creation(
                 dummy_factory(f"field_{i}_0"),
                 dummy_factory(f"field_{i}_1"),
                 bases=[dummy_factory(f"base_{i}_0"), dummy_factory(f"base_{i}_1")],
+                extra_fields={},
             )
             for i in range(included_count)
         ]
@@ -135,7 +136,7 @@ def test_extends(
             dummy_factory(f"include_{i}") for i in range(included_count)
         ]
 
-    model = MappedModel(bases=[])
+    model = MappedModel(bases=[], extra_fields={})
     assert model.extend(
         columns=dummy_factory("columns"),
         relationships=dummy_factory("relationships"),

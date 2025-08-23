@@ -72,7 +72,7 @@ class MappedModel(MarshalModel):
             includes=(self, *includes),
             extra_fields={
                 **self.extra_fields,
-                **({} if extra_fields is None else extra_fields)
+                **({} if extra_fields is None else extra_fields),
             },
         )
 
@@ -84,4 +84,8 @@ class MappedModel(MarshalModel):
                 yield field
 
     def as_patch(self) -> Self:
-        return type(self)(*self.patch_fields(), bases=self.bases)
+        return type(self)(
+            *self.patch_fields(),
+            bases=self.bases,
+            extra_fields=self.extra_fields,
+        )
