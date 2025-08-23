@@ -93,6 +93,7 @@ def test_model_generation(
     simple_model.model_name = dummy_factory("name")
     simple_model.generate_base = Mock(return_value=dummy_factory("base"))
     simple_model.fields = [field_mock]
+    simple_model.extra_fields = {"extra_field_name": dummy_factory("extra_field")}
 
     create_model_mock = mock_stack.enter_mock(
         models, "create_model", return_value=dummy_factory("return")
@@ -104,4 +105,5 @@ def test_model_generation(
         dummy_factory("name"),
         __base__=dummy_factory("base"),
         field_name=dummy_factory("field_field"),
+        extra_field_name=dummy_factory("extra_field"),
     )

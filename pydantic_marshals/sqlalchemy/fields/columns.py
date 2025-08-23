@@ -42,10 +42,22 @@ class ColumnField(PatchMarshalField):
         )
 
     @classmethod
-    def convert(cls, source: Any = None, type_: Any = None, *_: Any) -> Self | None:
+    def convert(
+        cls,
+        source: Any = None,
+        type_: Any = None,
+        alias: Any = None,
+        *_: Any,
+    ) -> Self | None:
         if isinstance(source, MappedColumn) and (
             type_ is None or isinstance(type_, TypeHint)
         ):
+            if isinstance(alias, str):
+                return cls(
+                    mapped_column=source,
+                    type_=type_,
+                    alias=alias,
+                )
             return cls(mapped_column=source, type_=type_)
         return None
 
@@ -86,7 +98,9 @@ class ColumnField(PatchMarshalField):
 ColumnType = (
     MappedColumn[Any]
     | tuple[MappedColumn[Any], TypeHint]
+    | tuple[MappedColumn[Any], TypeHint, str]
     | Mapped[Any]
     | tuple[Mapped[Any], TypeHint]
+    | tuple[Mapped[Any], TypeHint, str]
     | ColumnField
 )

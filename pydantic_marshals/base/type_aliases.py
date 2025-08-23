@@ -18,4 +18,4 @@ TypeHint: TypeAlias = (
     | type(None)
 )
 
-FieldType: TypeAlias = tuple[TypeHint, FieldInfo]
+FieldType: TypeAlias = TypeHint | tuple[TypeHint, Any | FieldInfo]

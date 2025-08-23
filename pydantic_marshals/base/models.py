@@ -4,10 +4,11 @@ from typing import Any, ClassVar
 from pydantic import BaseModel, ConfigDict, create_model
 
 from pydantic_marshals.base.fields.base import MarshalField
+from pydantic_marshals.base.type_aliases import FieldType
 
 
 class MarshalBaseModel(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class FieldConverter:
@@ -96,6 +97,7 @@ class MarshalModel(FieldConverter):
         self,
         *fields: MarshalField,
         bases: list[type[BaseModel]],
+        extra_fields: dict[str, FieldType],
     ) -> None:
         """
         :param fields: fields to include in the model
@@ -103,6 +105,7 @@ class MarshalModel(FieldConverter):
         """
         self.fields: list[MarshalField] = list(fields)
         self.bases: list[type[BaseModel]] = bases
+        self.extra_fields: dict[str, FieldType] = extra_fields
         self._generated_model: type[BaseModel] | None = None
 
     def __set_name__(self, owner: type, name: str) -> None:
@@ -126,6 +129,7 @@ class MarshalModel(FieldConverter):
                 mapped_field.generate_name(): mapped_field.generate_field()
                 for mapped_field in self.fields
             },
+            **self.extra_fields,
         )
 
     @property
