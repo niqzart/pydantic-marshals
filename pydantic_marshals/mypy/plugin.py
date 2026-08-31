@@ -44,8 +44,14 @@ class MarshalsPlugin(Plugin):
 
 
 def add_info_hook(ctx: DynamicClassDefContext) -> None:
+    fullname = ctx.api.qualified_name(ctx.name)
+    existing = ctx.api.lookup_fully_qualified_or_none(fullname)
+    if existing is not None and isinstance(existing.node, TypeInfo):
+        type_matrix.add(fullname)
+        return
+
     class_def = ClassDef(ctx.name, Block([]))
-    class_def.fullname = ctx.api.qualified_name(ctx.name)
+    class_def.fullname = fullname
     info = TypeInfo(SymbolTable(), class_def, ctx.api.cur_mod_id)
     class_def.info = info
     bm = ctx.api.named_type(pydantic_base_model_qualname)
@@ -55,7 +61,7 @@ def add_info_hook(ctx: DynamicClassDefContext) -> None:
     calculate_mro(info)
 
     ctx.api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, info))
-    type_matrix.add(class_def.fullname)
+    type_matrix.add(fullname)
 
 
 def plugin(_: str) -> type[Plugin]:
